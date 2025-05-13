@@ -15,11 +15,14 @@ public class UnityToGemini : MonoBehaviour
     private static readonly List<string> InvalidJsonFormatPattern = new List<string>() { "```json", "```" };
 
     // Interrogation related variables
-    public GameObject interrogationCanvas;
+    public GameObject stockPriceCanvas;
     public string questionToAsk;
     public string objectToAsk;
     public string timeToAsk;
     public string interrogationType;
+
+    public StockPriceDisplay spDisplay;
+    
 
 
     public string OGPrompt;
@@ -51,6 +54,15 @@ public class UnityToGemini : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        // Example usage
+        spDisplay = stockPriceCanvas.GetComponent<StockPriceDisplay>();
+        spDisplay.Initialize("AAPL", 150.00f);
+
+        
+        // Later, to update the price (this will automatically update the chart)
+        spDisplay.UpdatePrice(155.50f);
+
+        
         // Instantiate the InterrogationCanvas prefab
         //GameObject interrogationCanvasPrefab = Resources.Load<GameObject>("Prefabs/InterrogationCanvas");
         //if (interrogationCanvasPrefab != null)
@@ -66,20 +78,23 @@ public class UnityToGemini : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // if (Input.GetKeyDown(KeyCode.L) && apiKey != null)
-        // {
-        //     StartCoroutine(SendRequestWithDropdown(questionToAsk, interrogationType, timeToAsk));
-        // }
-        //
-        // if (Input.GetKeyDown(KeyCode.P))
-        // {
-        //     StartCoroutine(SendKeyValidationToGemini(apiKey));
-        // }
-        //
-        // if(Input.GetKeyDown(KeyCode.Escape))
-        // {
-        //    interrogationCanvas.GetComponent<InterrogationCanvas>().OpenMenu();
-        // }
+         if (Input.GetKeyDown(KeyCode.L) && apiKey != null)
+         {
+             //StartCoroutine(SendRequestWithDropdown(questionToAsk, interrogationType, timeToAsk));
+         }
+        
+         if (Input.GetKeyDown(KeyCode.P))
+         {
+             float newPrice = spDisplay.CurrentPrice + Random.Range(-5f, 5f);
+             spDisplay.UpdatePrice(newPrice);
+             //StartCoroutine(SendKeyValidationToGemini(apiKey));
+         }
+        
+         if(Input.GetKeyDown(KeyCode.Escape))
+         {
+             
+            //interrogationCanvas.GetComponent<InterrogationCanvas>().OpenMenu();
+         }
     }
 
     public void SendRequest(){
