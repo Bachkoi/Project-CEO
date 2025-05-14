@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
 
+
 public class StockPriceDisplay : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI stockSymbolText;
@@ -19,7 +20,6 @@ public class StockPriceDisplay : MonoBehaviour
     private string stockSymbol;
     private float chartMinPrice;
     private float chartMaxPrice;
-    private float chartTimeRange = 50f;
     
     public float CurrentPrice => currentPrice;
 
@@ -42,13 +42,23 @@ public class StockPriceDisplay : MonoBehaviour
 
     private void AddPricePoint(float price)
     {
-        float currentTime = Time.time;
-        priceHistory.Add(new StockPricePoint(price, currentTime));
+        // Only using index for positioning, removing time dependency
+        int newIndex = priceHistory.Count;
+        priceHistory.Add(new StockPricePoint(price, 0, newIndex));
 
         // Keep only the last maxDataPoints
         if (priceHistory.Count > maxDataPoints)
         {
             priceHistory.RemoveAt(0);
+            // Reindex the remaining points
+            for (int i = 0; i < priceHistory.Count; i++)
+            {
+                priceHistory[i] = new StockPricePoint(
+                    priceHistory[i].Price, 
+                    0, 
+                    i
+                );
+            }
         }
 
         UpdateChart();
@@ -57,35 +67,67 @@ public class StockPriceDisplay : MonoBehaviour
     private void UpdateChart()
     {
         if (priceHistory.Count < 2) return;
-
+    
         // Find min and max prices for scaling
         chartMinPrice = float.MaxValue;
         chartMaxPrice = float.MinValue;
-        float startTime = priceHistory[priceHistory.Count - 1].time - chartTimeRange;
-
+    
         foreach (var point in priceHistory)
         {
-            if (point.price < chartMinPrice) chartMinPrice = point.price;
-            if (point.price > chartMaxPrice) chartMaxPrice = point.price;
+            if (point.Price < chartMinPrice) chartMinPrice = point.Price;
+            if (point.Price > chartMaxPrice) chartMaxPrice = point.Price;
         }
-
+    
         // Add 10% padding to min/max
         float pricePadding = (chartMaxPrice - chartMinPrice) * 0.1f;
         chartMinPrice -= pricePadding;
         chartMaxPrice += pricePadding;
-
+    
         // Create points for the line renderer
         Vector2[] points = new Vector2[priceHistory.Count];
+        Color32[] colors = new Color32[priceHistory.Count - 1]; // Changed to Color32
+        
+        // Get the actual chart dimensions
+        float chartWidth = chartContainer.rect.width;
+        float chartHeight = chartContainer.rect.height;
+        
+        float maxIndex = maxDataPoints - 1;
+        
+        // Define colors with correct values (using Color32 for byte values 0-255)
+        Color32 increaseColor = new Color32(0, 255, 0, 255); // Bright green
+        Color32 decreaseColor = new Color32(255, 0, 0, 255); // Bright red
+        
         for (int i = 0; i < priceHistory.Count; i++)
         {
             var point = priceHistory[i];
-            float x = ((point.time - startTime) / chartTimeRange) * chartContainer.rect.width;
-            float y = Mathf.InverseLerp(chartMinPrice, chartMaxPrice, point.price) * chartContainer.rect.height;
+            
+            // Calculate normalized position (0-1 range)
+            float normalizedX = point.Index / maxIndex;
+            float normalizedY = (point.Price - chartMinPrice) / (chartMaxPrice - chartMinPrice);
+            
+            // Convert to actual coordinates within the chart container
+            float x = normalizedX * chartWidth;
+            float y = normalizedY * chartHeight;
+            
+            // Ensure points stay within bounds
+            x = Mathf.Clamp(x, 0, chartWidth);
+            y = Mathf.Clamp(y, 0, chartHeight);
+            
             points[i] = new Vector2(x, y);
+
+            // Set segment color based on price change (except for the last point)
+            if (i < priceHistory.Count - 1)
+            {
+                float currentPrice = priceHistory[i].Price;
+                float nextPrice = priceHistory[i + 1].Price;
+                colors[i] = nextPrice >= currentPrice ? increaseColor : decreaseColor;
+            }
         }
 
         lineRenderer.points = points;
-        lineRenderer.SetVerticesDirty();
+        lineRenderer.segmentColors = colors;
+        lineRenderer.useSegmentColors = true;
+        lineRenderer.SetAllDirty();
     }
 
     private void UpdateDisplay(float changePercentage = 0f)
@@ -94,6 +136,5 @@ public class StockPriceDisplay : MonoBehaviour
         currentPriceText.text = $"${currentPrice:F2}";
         changePercentageText.text = $"{changePercentage:F2}%";
         changePercentageText.color = changePercentage >= 0 ? Color.green : Color.red;
-        lineRenderer.TestLineRenderer();
     }
 }
