@@ -247,18 +247,16 @@ public class UnityToGemini : MonoBehaviour
             url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + apiInput;
 
             // Serialize the object to JSON
-            //string newContent = "{\n    \"contents:\": [\n      {\n     \"role\": \"user\", \n      \"parts\": [\n      {\n     \"text\": \"Test\"\n        }\n         ]\n     }\n     ]\n ";
-            //newContent += "}";
             Backend.GeminiRequest geminiRequest = new Backend.GeminiRequest();
             geminiRequest.Contents = new List<Backend.Content>();
             List<Backend.Part> tempParts = new List<Backend.Part>();
-            Backend.Part tempPart = new Backend.Part("\"text\":\"Test\"");
+            Backend.Part tempPart = new Backend.Part("Test validation request");
             tempParts.Add(tempPart);
             Backend.Content tempContent = new Backend.Content();
             tempContent.Role = "user";
             tempContent.Parts = tempParts;
             geminiRequest.Contents.Add(tempContent);
-
+    
             string jsonData = JsonConvert.SerializeObject(geminiRequest, Formatting.None);
             byte[] jsonToSend = Encoding.UTF8.GetBytes(jsonData);
             using (UnityWebRequest www = new UnityWebRequest(url, "POST"))
@@ -266,24 +264,26 @@ public class UnityToGemini : MonoBehaviour
                 www.uploadHandler = new UploadHandlerRaw(jsonToSend);
                 www.downloadHandler = new DownloadHandlerBuffer();
                 www.SetRequestHeader("Content-Type", "application/json");
-
+    
                 
                 // Send the request
                 yield return www.SendWebRequest();
-
+    
                 if (www.result != UnityWebRequest.Result.Success)
                 {
-                    Debug.LogError(www.error);
-                    //resultText.text = www.error;
-                    //UponWebError();
-                    // Here is where we would relay to the user the reason as to why their key didn't validate (no tokens, wrong format, illegal key, etc)
+                    Debug.LogError($"API Key validation failed: {www.error}");
+                    
+                    // Trigger callback with error information so UI can be updated
+                    GeminiResponseCallback?.Invoke("ERROR:" + www.error);
                 }
                 else
                 {
+                    // Set the API key and notify listeners that validation was successful
                     apiKey = apiInput.Trim();
-                    //resultText.text = "API Key has been validated, please enter in a username.";
-                    //playerUsernameInput.interactable = true;
-
+                    Debug.Log("API Key validation successful");
+                    
+                    // Trigger the callback with the successful response
+                    GeminiResponseCallback?.Invoke(www.downloadHandler.text);
                 }
             }
     }

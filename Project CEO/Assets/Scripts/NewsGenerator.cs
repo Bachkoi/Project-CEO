@@ -419,6 +419,7 @@ public class NewsGenerator : MonoBehaviour
                 {
                     // Queue the update instead of applying immediately
                     pendingNewsText = newsHeadline;
+                    generatedActions.Add(newsHeadline);
                     updatePending = true;
                     
                     Debug.Log($"News update queued: '{newsHeadline}'. Will apply after current cycle completes.");
