@@ -54,6 +54,12 @@ public class UnityToGemini : MonoBehaviour
             Instance.apiKey = apiKey;
             Instance.url = url;
             Instance.lastJsonRequest = lastJsonRequest;
+            Instance.stockPriceCanvas = stockPriceCanvas;
+            Instance.spDisplay = spDisplay;
+            Instance.companyDescription = companyDescription;
+            Instance.companyName = companyName;
+            Instance.UILRTEst = UILRTEst;
+            Instance.OGPrompt = OGPrompt;
         }
         else
         {
