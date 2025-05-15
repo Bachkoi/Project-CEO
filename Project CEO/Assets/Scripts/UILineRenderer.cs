@@ -6,8 +6,17 @@ public class UILineRenderer : Graphic
     public Vector2[] points;
     public Color32[] segmentColors;
     public float thickness = 10f;
-    //private bool useSegmentColors;
     public bool useSegmentColors;
+
+    protected override void Awake()
+    {
+        base.Awake();
+        // Ensure we're using the correct material
+        if (material == null || material.shader.name != "UI/Default")
+        {
+            material = new Material(Shader.Find("UI/Default"));
+        }
+    }
 
     protected override void OnPopulateMesh(VertexHelper vh)
     {
@@ -15,6 +24,8 @@ public class UILineRenderer : Graphic
 
         if (points == null || points.Length < 2)
             return;
+
+        Color32 vertexColor = (Color32)color;
 
         for (int i = 0; i < points.Length - 1; i++)
         {
@@ -29,21 +40,36 @@ public class UILineRenderer : Graphic
             Vector2 v3 = nextPoint + normal * (thickness * 0.5f);
             Vector2 v4 = nextPoint - normal * (thickness * 0.5f);
 
-            // Get the current segment color
-            Color segmentColor = useSegmentColors && segmentColors != null && i < segmentColors.Length 
+            Color32 segmentColor = useSegmentColors && segmentColors != null && i < segmentColors.Length 
                 ? segmentColors[i] 
-                : color;
+                : vertexColor;
 
             int vertCount = vh.currentVertCount;
 
-            vh.AddVert(v1, segmentColor, Vector2.zero);
-            vh.AddVert(v2, segmentColor, Vector2.zero);
-            vh.AddVert(v3, segmentColor, Vector2.zero);
-            vh.AddVert(v4, segmentColor, Vector2.zero);
+            UIVertex vert = UIVertex.simpleVert;
+            vert.color = segmentColor;
+
+            vert.position = v1;
+            vh.AddVert(vert);
+
+            vert.position = v2;
+            vh.AddVert(vert);
+
+            vert.position = v3;
+            vh.AddVert(vert);
+
+            vert.position = v4;
+            vh.AddVert(vert);
 
             vh.AddTriangle(vertCount + 0, vertCount + 1, vertCount + 2);
             vh.AddTriangle(vertCount + 2, vertCount + 3, vertCount + 0);
         }
+    }
+
+    public void SetPoints(Vector2[] newPoints)
+    {
+        points = newPoints;
+        SetVerticesDirty();
     }
 
     protected override void OnRectTransformDimensionsChange()
@@ -57,4 +83,12 @@ public class UILineRenderer : Graphic
         SetVerticesDirty();
         SetMaterialDirty();
     }
+
+#if UNITY_EDITOR
+    protected override void OnValidate()
+    {
+        base.OnValidate();
+        SetAllDirty();
+    }
+#endif
 }

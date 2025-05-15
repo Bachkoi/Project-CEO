@@ -22,7 +22,9 @@ public class UnityToGemini : MonoBehaviour
     public string interrogationType;
 
     public StockPriceDisplay spDisplay;
-    
+
+
+    public UILineRendererTest UILRTEst;
 
 
     public string OGPrompt;
@@ -87,6 +89,7 @@ public class UnityToGemini : MonoBehaviour
          {
              float newPrice = spDisplay.CurrentPrice + Random.Range(-5f, 5f);
              spDisplay.UpdatePrice(newPrice);
+             UILRTEst.ToggleColor();
              //StartCoroutine(SendKeyValidationToGemini(apiKey));
          }
         
