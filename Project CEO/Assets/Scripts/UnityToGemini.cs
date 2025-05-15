@@ -1,10 +1,14 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Newtonsoft.Json;
 using UnityEngine.Networking;
 using System.Text;
 using Backend;
+using Sirenix.OdinInspector;
+using Random = UnityEngine.Random;
+
 public class UnityToGemini : MonoBehaviour
 {
     // Necessary information for Gemini
@@ -23,11 +27,20 @@ public class UnityToGemini : MonoBehaviour
 
     public StockPriceDisplay spDisplay;
     
+    [BoxGroup("Company Info")]
+    public string companyName;
+    public string companyDescription;
+    
+
+
+    public UILineRendererTest UILRTEst;
 
 
     public string OGPrompt;
 
     public static UnityToGemini Instance;
+    
+    public static event Action<string> GeminiResponseCallback;
 
     private void Awake()
     {
@@ -41,6 +54,12 @@ public class UnityToGemini : MonoBehaviour
             Instance.apiKey = apiKey;
             Instance.url = url;
             Instance.lastJsonRequest = lastJsonRequest;
+            Instance.stockPriceCanvas = stockPriceCanvas;
+            Instance.spDisplay = spDisplay;
+            Instance.companyDescription = companyDescription;
+            Instance.companyName = companyName;
+            Instance.UILRTEst = UILRTEst;
+            Instance.OGPrompt = OGPrompt;
         }
         else
         {
@@ -55,12 +74,12 @@ public class UnityToGemini : MonoBehaviour
     void Start()
     {
         // Example usage
-        spDisplay = stockPriceCanvas.GetComponent<StockPriceDisplay>();
-        spDisplay.Initialize("AAPL", 150.00f);
+        spDisplay = stockPriceCanvas?.GetComponent<StockPriceDisplay>();
+        spDisplay?.Initialize("AAPL", 150.00f);
 
         
         // Later, to update the price (this will automatically update the chart)
-        spDisplay.UpdatePrice(155.50f);
+        spDisplay?.UpdatePrice(155.50f);
 
         
         // Instantiate the InterrogationCanvas prefab
@@ -87,6 +106,7 @@ public class UnityToGemini : MonoBehaviour
          {
              float newPrice = spDisplay.CurrentPrice + Random.Range(-5f, 5f);
              spDisplay.UpdatePrice(newPrice);
+             UILRTEst.ToggleColor();
              //StartCoroutine(SendKeyValidationToGemini(apiKey));
          }
         
@@ -99,6 +119,11 @@ public class UnityToGemini : MonoBehaviour
 
     public void SendRequest(){
         StartCoroutine(SendRequestWithDropdown(questionToAsk, interrogationType, timeToAsk));
+    }
+
+    public void SendNewsRequest(string request)
+    {
+        StartCoroutine((SendRequestToGemini(request)));
     }
 
     public IEnumerator SendRequestWithDropdown(string question, string interrogationType, string timeDropdown){
@@ -172,56 +197,56 @@ public class UnityToGemini : MonoBehaviour
     public IEnumerator SendRequestToGemini(string request)
     {
 
-           Debug.Log("Started API Validation Request");
-            string url = "";
+       Debug.Log("Started API Validation Request");
+        string url = "";
 
-            url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + apiKey;
+        url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + apiKey;
 
-            // Serialize the object to JSON
-            Backend.GeminiRequest geminiRequest = new Backend.GeminiRequest();
-            geminiRequest.Contents = new List<Backend.Content>();
-            List<Backend.Part> tempParts = new List<Backend.Part>();
-            Backend.Part tempPart = new Backend.Part("\"text\":\"Test\"");
-            tempParts.Add(tempPart);
-            Backend.Content tempContent = new Backend.Content();
-            tempContent.Role = "user";
-            tempContent.Parts = tempParts;
-            geminiRequest.Contents.Add(tempContent);
+        // Serialize the object to JSON
+        Backend.GeminiRequest geminiRequest = new Backend.GeminiRequest();
+        geminiRequest.Contents = new List<Backend.Content>();
+        List<Backend.Part> tempParts = new List<Backend.Part>();
+        Backend.Part tempPart = new Backend.Part("\"text\":\"" + request + "\"");
+        tempParts.Add(tempPart);
+        Backend.Content tempContent = new Backend.Content();
+        tempContent.Role = "user";
+        tempContent.Parts = tempParts;
+        geminiRequest.Contents.Add(tempContent);
 
-            string jsonData = JsonConvert.SerializeObject(geminiRequest, new JsonSerializerSettings
+        string jsonData = JsonConvert.SerializeObject(geminiRequest, new JsonSerializerSettings
+        {
+        NullValueHandling = NullValueHandling.Ignore
+        });
+        Debug.Log("JSON DATA: " + jsonData);
+        byte[] jsonToSend = Encoding.UTF8.GetBytes(jsonData);
+        using (UnityWebRequest www = new UnityWebRequest(url, "POST"))
+        {
+            www.uploadHandler = new UploadHandlerRaw(jsonToSend);
+            www.downloadHandler = new DownloadHandlerBuffer();
+            www.SetRequestHeader("Content-Type", "application/json");
+
+            
+            // Send the request
+            yield return www.SendWebRequest();
+
+            if (www.result != UnityWebRequest.Result.Success)
             {
-            NullValueHandling = NullValueHandling.Ignore
-            });
-            byte[] jsonToSend = Encoding.UTF8.GetBytes(jsonData);
-            using (UnityWebRequest www = new UnityWebRequest(url, "POST"))
-            {
-                www.uploadHandler = new UploadHandlerRaw(jsonToSend);
-                www.downloadHandler = new DownloadHandlerBuffer();
-                www.SetRequestHeader("Content-Type", "application/json");
-
-                
-                // Send the request
-                yield return www.SendWebRequest();
-
-                if (www.result != UnityWebRequest.Result.Success)
-                {
-                    Debug.LogError(www.error);
-                    //resultText.text = www.error;
-                    //UponWebError();
-                    // Here is where we would relay to the user the reason as to why their key didn't validate (no tokens, wrong format, illegal key, etc)
-                }
-                else
-                {
-                    //TimeManager.Instance.DecrementActionCounter();
-                    //Debug.Log("Action Counter: " + TimeManager.Instance.actionCounter);
-                    //apiKey = apiInput.Trim();
-                    //resultText.text = "API Key has been validated, please enter in a username.";
-                    //playerUsernameInput.interactable = true;
-
-                }
+                Debug.LogError(www.error);
+                //resultText.text = www.error;
+                //UponWebError();
+                // Here is where we would relay to the user the reason as to why their key didn't validate (no tokens, wrong format, illegal key, etc)
             }
+            else
+            {
+                GeminiResponseCallback?.Invoke(www.downloadHandler.text);
+                //TimeManager.Instance.DecrementActionCounter();
+                //Debug.Log("Action Counter: " + TimeManager.Instance.actionCounter);
+                //apiKey = apiInput.Trim();
+                //resultText.text = "API Key has been validated, please enter in a username.";
+                //playerUsernameInput.interactable = true;
 
-        //return null;
+            }
+        }
     }
 
     public IEnumerator SendKeyValidationToGemini(string apiInput)
@@ -232,18 +257,16 @@ public class UnityToGemini : MonoBehaviour
             url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + apiInput;
 
             // Serialize the object to JSON
-            //string newContent = "{\n    \"contents:\": [\n      {\n     \"role\": \"user\", \n      \"parts\": [\n      {\n     \"text\": \"Test\"\n        }\n         ]\n     }\n     ]\n ";
-            //newContent += "}";
             Backend.GeminiRequest geminiRequest = new Backend.GeminiRequest();
             geminiRequest.Contents = new List<Backend.Content>();
             List<Backend.Part> tempParts = new List<Backend.Part>();
-            Backend.Part tempPart = new Backend.Part("\"text\":\"Test\"");
+            Backend.Part tempPart = new Backend.Part("Test validation request");
             tempParts.Add(tempPart);
             Backend.Content tempContent = new Backend.Content();
             tempContent.Role = "user";
             tempContent.Parts = tempParts;
             geminiRequest.Contents.Add(tempContent);
-
+    
             string jsonData = JsonConvert.SerializeObject(geminiRequest, Formatting.None);
             byte[] jsonToSend = Encoding.UTF8.GetBytes(jsonData);
             using (UnityWebRequest www = new UnityWebRequest(url, "POST"))
@@ -251,24 +274,26 @@ public class UnityToGemini : MonoBehaviour
                 www.uploadHandler = new UploadHandlerRaw(jsonToSend);
                 www.downloadHandler = new DownloadHandlerBuffer();
                 www.SetRequestHeader("Content-Type", "application/json");
-
+    
                 
                 // Send the request
                 yield return www.SendWebRequest();
-
+    
                 if (www.result != UnityWebRequest.Result.Success)
                 {
-                    Debug.LogError(www.error);
-                    //resultText.text = www.error;
-                    //UponWebError();
-                    // Here is where we would relay to the user the reason as to why their key didn't validate (no tokens, wrong format, illegal key, etc)
+                    Debug.LogError($"API Key validation failed: {www.error}");
+                    
+                    // Trigger callback with error information so UI can be updated
+                    GeminiResponseCallback?.Invoke("ERROR:" + www.error);
                 }
                 else
                 {
+                    // Set the API key and notify listeners that validation was successful
                     apiKey = apiInput.Trim();
-                    //resultText.text = "API Key has been validated, please enter in a username.";
-                    //playerUsernameInput.interactable = true;
-
+                    Debug.Log("API Key validation successful");
+                    
+                    // Trigger the callback with the successful response
+                    GeminiResponseCallback?.Invoke(www.downloadHandler.text);
                 }
             }
     }
@@ -293,41 +318,41 @@ public class UnityToGemini : MonoBehaviour
     }
 
 
-     /// <summary>
-        /// Get the content based on the Gemini role and the text (prompt).
-        /// </summary>
-        /// <param name="geminiRole">Gemini role in the request to Gemini.</param>
-        /// <param name="text">Complete prompt in the request to Gemini.</param>
-        /// <returns>Content object which could in AiRequest</returns>
-        /// <exception cref="ArgumentOutOfRangeException">If non-existent role used, throw ArgumentOutOfRangeException</exception>
-        private static Backend.Content BuildContent(Backend.GeminiRole geminiRole, string text)
-        {
-            Backend.Content tempContent = new Backend.Content();
-            tempContent.Role = geminiRole.ToString();
-            Backend.Part tempPart = new Backend.Part(text);
-            tempContent.Parts = new List<Backend.Part>();
-            tempContent.Parts.Add(tempPart);
-            Debug.Log("Temp Part: " + tempPart.ToString());
-            return tempContent;
-            //return new Content
-            //{
-            //    Role = geminiRole.ToString()
-            //    //switch
-            //    //{
-            //    //    GeminiRole.User => GeminiRole.User,
-            //    //    GeminiRole.Model => GeminiRole.Model,
-            //    //    _ => throw new ArgumentOutOfRangeException()
-            //    //}
-            //    ,
-            //    Parts =
-            //    {
-            //        new Part(text)
-            //        {
-            //            Text = text,
-            //        }
-            //    }
-            //};
-        }
+    /// <summary>
+    /// Get the content based on the Gemini role and the text (prompt).
+    /// </summary>
+    /// <param name="geminiRole">Gemini role in the request to Gemini.</param>
+    /// <param name="text">Complete prompt in the request to Gemini.</param>
+    /// <returns>Content object which could in AiRequest</returns>
+    /// <exception cref="ArgumentOutOfRangeException">If non-existent role used, throw ArgumentOutOfRangeException</exception>
+    private static Backend.Content BuildContent(Backend.GeminiRole geminiRole, string text)
+    {
+        Backend.Content tempContent = new Backend.Content();
+        tempContent.Role = geminiRole.ToString();
+        Backend.Part tempPart = new Backend.Part(text);
+        tempContent.Parts = new List<Backend.Part>();
+        tempContent.Parts.Add(tempPart);
+        Debug.Log("Temp Part: " + tempPart.ToString());
+        return tempContent;
+        //return new Content
+        //{
+        //    Role = geminiRole.ToString()
+        //    //switch
+        //    //{
+        //    //    GeminiRole.User => GeminiRole.User,
+        //    //    GeminiRole.Model => GeminiRole.Model,
+        //    //    _ => throw new ArgumentOutOfRangeException()
+        //    //}
+        //    ,
+        //    Parts =
+        //    {
+        //        new Part(text)
+        //        {
+        //            Text = text,
+        //        }
+        //    }
+        //};
+    }
 
                 /// <summary>
         /// Clean the text from the invalid patterns (here only invalid json format is applied).
@@ -354,9 +379,9 @@ public class UnityToGemini : MonoBehaviour
         }
 
         public void UpdateOGPrompt(){
-
+            
         }
-
+        
         public void JudgeCharacter(){
 
             // If the character is guilty, the player wins.
