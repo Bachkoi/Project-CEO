@@ -315,6 +315,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 3947827198603865384, guid: 12b04a120ff9e0b4dafc93812318c2f2, type: 3}
+      propertyPath: m_text
+      value: Here's important news
+      objectReference: {fileID: 0}
     - target: {fileID: 4167576552441354681, guid: 12b04a120ff9e0b4dafc93812318c2f2, type: 3}
       propertyPath: m_Pivot.x
       value: 0
@@ -393,22 +397,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4167576552441354681, guid: 12b04a120ff9e0b4dafc93812318c2f2, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4689772757701574118, guid: 12b04a120ff9e0b4dafc93812318c2f2, type: 3}
-      propertyPath: newsPrompt
-      value: "We are playing a game. I have a company called {0} that {1}. Your job
-        is to generate a headline of an action that my company is taking. This is
-        not a serious game, so the actions can be funny and humorous. {2} Please
-        make sure the new action is not the same as the generated ones. Don\u2019t
-        explain your choice. Please return in JSON format: {Action:\\\u201Danswer\\\u201D}. "
-      objectReference: {fileID: 0}
-    - target: {fileID: 4689772757701574118, guid: 12b04a120ff9e0b4dafc93812318c2f2, type: 3}
-      propertyPath: scrollSpeed
-      value: 20
-      objectReference: {fileID: 0}
-    - target: {fileID: 4689772757701574118, guid: 12b04a120ff9e0b4dafc93812318c2f2, type: 3}
-      propertyPath: showDebugLines
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5586309487736137074, guid: 12b04a120ff9e0b4dafc93812318c2f2, type: 3}

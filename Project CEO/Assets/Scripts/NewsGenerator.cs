@@ -6,6 +6,7 @@ using TMPro;
 using Newtonsoft.Json;
 using System;
 using Sirenix.OdinInspector;
+using System.Linq;
 
 public class NewsGenerator : MonoBehaviour
 {
@@ -59,14 +60,26 @@ public class NewsGenerator : MonoBehaviour
             if (!string.IsNullOrEmpty(newsTitleText.text))
             {
                 newsTitleText.text = newsTitleText.text;
+                
+                // Only start scrolling if there's actual content
+                StartScrollingIfNeeded();
             }
-            
-            // Start the scrolling routine after a short delay
-            StartCoroutine(ScrollTitleText());
         }
         else
         {
             Debug.LogError("newsTitleText is not assigned!");
+        }
+            }
+            
+            /// <summary>
+            /// Starts the scrolling coroutine if the text is not empty and scrolling is not already active
+            /// </summary>
+            private void StartScrollingIfNeeded()
+            {
+        if (newsTitleText != null && !string.IsNullOrWhiteSpace(newsTitleText.text) && !isScrollingActive)
+        {
+            StartCoroutine(ScrollTitleText());
+            Debug.Log("Started scrolling news title: " + newsTitleText.text);
         }
     }
 
@@ -122,6 +135,13 @@ public class NewsGenerator : MonoBehaviour
     
     private IEnumerator ScrollTitleText()
     {
+        // Don't start scrolling if there's no text
+        if (newsTitleText == null || string.IsNullOrWhiteSpace(newsTitleText.text))
+        {
+            isScrollingActive = false;
+            yield break;
+        }
+        
         isScrollingActive = true;
         RectTransform textRectTransform = newsTitleText.rectTransform;
         
@@ -326,8 +346,11 @@ public class NewsGenerator : MonoBehaviour
             
             Debug.Log($"Forced news update: '{newText}'");
             
-            // Restart scrolling
-            StartCoroutine(ScrollTitleText());
+            // Only restart scrolling if there's actual content
+            if (!string.IsNullOrWhiteSpace(newText))
+            {
+                StartScrollingIfNeeded();
+            }
         }
     }
     
@@ -400,10 +423,10 @@ public class NewsGenerator : MonoBehaviour
                     
                     Debug.Log($"News update queued: '{newsHeadline}'. Will apply after current cycle completes.");
                     
-                    // If no active scrolling, start it now
-                    if (!isScrollingActive)
+                    // If no active scrolling and we have content, start it now
+                    if (!isScrollingActive && !string.IsNullOrWhiteSpace(newsHeadline))
                     {
-                        StartCoroutine(ScrollTitleText());
+                        StartScrollingIfNeeded();
                     }
                 }
                 else
@@ -445,17 +468,76 @@ public class NewsGenerator : MonoBehaviour
                 string jsonPart = text.Substring(startIndex + 7, endIndex - startIndex - 7);
                 try
                 {
-                    // Try to parse as JSON to extract a news headline
-                    var jsonObj = JsonConvert.DeserializeAnonymousType(jsonPart, new { headline = "" });
-                    if (jsonObj != null && !string.IsNullOrEmpty(jsonObj.headline))
+                    // Try to parse as JSON to extract a news headline from various possible formats
+                    var jsonObj = JsonConvert.DeserializeObject<Dictionary<string, string>>(jsonPart);
+                    if (jsonObj != null)
                     {
-                        return jsonObj.headline;
+                        // Check for common field names that might contain the headline
+                        if (jsonObj.ContainsKey("Action"))
+                            return jsonObj["Action"];
+                        if (jsonObj.ContainsKey("action"))
+                            return jsonObj["action"];
+                        if (jsonObj.ContainsKey("headline"))
+                            return jsonObj["headline"];
+                        if (jsonObj.ContainsKey("Headline"))
+                            return jsonObj["Headline"];
+                        if (jsonObj.ContainsKey("text"))
+                            return jsonObj["text"];
+                        if (jsonObj.ContainsKey("Text"))
+                            return jsonObj["Text"];
+                        if (jsonObj.ContainsKey("news"))
+                            return jsonObj["news"];
+                        if (jsonObj.ContainsKey("News"))
+                            return jsonObj["News"];
+                            
+                        // If we have any value, just return the first one
+                        if (jsonObj.Count > 0)
+                            return jsonObj.Values.First();
                     }
                 }
                 catch
                 {
                     // If JSON parsing failed, just clean up the text
+                    // Remove the JSON markers and try to parse the whole text
+                    text = text.Replace("```json", "").Replace("```", "").Trim();
                 }
+            }
+        }
+        
+        // Try to parse the entire text as JSON if it starts with {
+        if (text.Trim().StartsWith("{") && text.Trim().EndsWith("}"))
+        {
+            try
+            {
+                var jsonObj = JsonConvert.DeserializeObject<Dictionary<string, string>>(text);
+                if (jsonObj != null)
+                {
+                    // Check for common field names that might contain the headline
+                    if (jsonObj.ContainsKey("Action"))
+                        return jsonObj["Action"];
+                    if (jsonObj.ContainsKey("action"))
+                        return jsonObj["action"];
+                    if (jsonObj.ContainsKey("headline"))
+                        return jsonObj["headline"];
+                    if (jsonObj.ContainsKey("Headline"))
+                        return jsonObj["Headline"];
+                    if (jsonObj.ContainsKey("text"))
+                        return jsonObj["text"];
+                    if (jsonObj.ContainsKey("Text"))
+                        return jsonObj["Text"];
+                    if (jsonObj.ContainsKey("news"))
+                        return jsonObj["news"];
+                    if (jsonObj.ContainsKey("News"))
+                        return jsonObj["News"];
+                        
+                    // If we have any value, just return the first one
+                    if (jsonObj.Count > 0)
+                        return jsonObj.Values.First();
+                }
+            }
+            catch
+            {
+                // If JSON parsing failed, continue with other cleaning methods
             }
         }
         
