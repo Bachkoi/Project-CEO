@@ -67,60 +67,51 @@ public class StockPriceDisplay : MonoBehaviour
     private void UpdateChart()
     {
         if (priceHistory.Count < 2) return;
-    
+
         // Find min and max prices for scaling
         chartMinPrice = float.MaxValue;
         chartMaxPrice = float.MinValue;
-    
+
         foreach (var point in priceHistory)
         {
             if (point.Price < chartMinPrice) chartMinPrice = point.Price;
             if (point.Price > chartMaxPrice) chartMaxPrice = point.Price;
         }
-    
+
         // Add 10% padding to min/max
         float pricePadding = (chartMaxPrice - chartMinPrice) * 0.1f;
         chartMinPrice -= pricePadding;
         chartMaxPrice += pricePadding;
-    
+
         // Create points for the line renderer
         Vector2[] points = new Vector2[priceHistory.Count];
-        Color32[] colors = new Color32[priceHistory.Count - 1]; // Changed to Color32
-        
-        // Get the actual chart dimensions
+        Color32[] colors = new Color32[priceHistory.Count - 1];
+
         float chartWidth = chartContainer.rect.width;
         float chartHeight = chartContainer.rect.height;
-        
         float maxIndex = maxDataPoints - 1;
-        
-        // Define colors with correct values (using Color32 for byte values 0-255)
-        Color32 increaseColor = new Color32(0, 255, 0, 255); // Bright green
-        Color32 decreaseColor = new Color32(255, 0, 0, 255); // Bright red
-        
+
+        // Define colors
+        Color32 increaseColor = new Color32(0, 255, 0, 255);
+        Color32 decreaseColor = new Color32(255, 0, 0, 255);
+
         for (int i = 0; i < priceHistory.Count; i++)
         {
             var point = priceHistory[i];
-            
+
             // Calculate normalized position (0-1 range)
             float normalizedX = point.Index / maxIndex;
             float normalizedY = (point.Price - chartMinPrice) / (chartMaxPrice - chartMinPrice);
-            
+
             // Convert to actual coordinates within the chart container
             float x = normalizedX * chartWidth;
             float y = normalizedY * chartHeight;
-            
-            // Ensure points stay within bounds
-            x = Mathf.Clamp(x, 0, chartWidth);
-            y = Mathf.Clamp(y, 0, chartHeight);
-            
+
             points[i] = new Vector2(x, y);
 
-            // Set segment color based on price change (except for the last point)
             if (i < priceHistory.Count - 1)
             {
-                float currentPrice = priceHistory[i].Price;
-                float nextPrice = priceHistory[i + 1].Price;
-                colors[i] = nextPrice >= currentPrice ? increaseColor : decreaseColor;
+                colors[i] = priceHistory[i + 1].Price >= point.Price ? increaseColor : decreaseColor;
             }
         }
 
