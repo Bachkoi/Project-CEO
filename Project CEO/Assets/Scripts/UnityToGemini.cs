@@ -73,13 +73,17 @@ public class UnityToGemini : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        // Example usage
-        spDisplay = stockPriceCanvas?.GetComponent<StockPriceDisplay>();
-        spDisplay?.Initialize("AAPL", 150.00f);
+        if (spDisplay != null)
+        {
+            // Example usage
+            spDisplay = stockPriceCanvas?.GetComponent<StockPriceDisplay>();
+            spDisplay?.Initialize("AAPL", 150.00f);
 
         
-        // Later, to update the price (this will automatically update the chart)
-        spDisplay?.UpdatePrice(155.50f);
+            // Later, to update the price (this will automatically update the chart)
+            spDisplay?.UpdatePrice(155.50f);
+        }
+
 
         
         // Instantiate the InterrogationCanvas prefab
