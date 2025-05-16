@@ -83,7 +83,7 @@ public class GameplayManager : MonoBehaviour
 
     IEnumerator EvaluatePublicReaction(string companyAction, string playerResponse)
     {
-        string prompt = $"I¡¯m talking to another AI acting as the public/reacting to a CEO¡¯s response. The company recently took this action: {{CompanyAction}}. The CEO responded to media/questions with: {{PlayerResponse}}.\r\n\r\nEvaluate the CEO¡¯s response based on:" +
+        string prompt = $"I'm talking to another AI acting as the public/reacting to a CEOï¿½ï¿½s response. The company recently took this action: {companyAction}. The CEO responded to media/questions with: {playerResponse}.\r\n\r\nEvaluate the CEO's response based on:" +
             $"\r\n\r\nCrisis Management (Did it address the issue effectively?)" +
             $"\r\n\r\nTone/PR Skill (Was it confident, empathetic, or tone-deaf?)" +
             $"\r\n\r\nPublic Perception (How will typical stakeholders react?)." +

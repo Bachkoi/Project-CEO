@@ -24,7 +24,6 @@ public class UnityToGemini : MonoBehaviour
     public string objectToAsk;
     public string timeToAsk;
     public string interrogationType;
-    public RaycastDetector raycastDetector;
 
     public StockPriceDisplay spDisplay;
     
@@ -57,7 +56,7 @@ public class UnityToGemini : MonoBehaviour
             Instance.apiKey ??= apiKey;
             Instance.url ??= url;
             Instance.lastJsonRequest ??= lastJsonRequest;
-            Instance.stockPriceCanvas ??= stockPriceCanvas;
+            Instance.stockPriceCanvas = stockPriceCanvas;
             Instance.spDisplay ??= spDisplay;
             Instance.companyDescription ??= companyDescription;
             Instance.companyName ??= companyName;
@@ -65,7 +64,6 @@ public class UnityToGemini : MonoBehaviour
             Instance.OGPrompt ??= OGPrompt;
             Instance.cm ??= cm;
             Instance.UILRTEst ??= UILRTEst;
-            Instance.stockPriceCanvas ??= stockPriceCanvas;
             Destroy(gameObject);
         }
         else
