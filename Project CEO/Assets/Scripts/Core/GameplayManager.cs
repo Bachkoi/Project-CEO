@@ -1,0 +1,121 @@
+using System.Collections;
+using System.Collections.Generic;
+using TMPro;
+using UnityEngine;
+using UnityEngine.Analytics;
+
+public class GameplayManager : MonoBehaviour
+{
+    public float stockThreshold = 30f;
+    public float stockPriceStart = 100f;
+    public float stockPriceChangeMagnitude = 10f;
+
+    private string lastCompanyAction;
+    private string lastPlayerResponse;
+
+    private bool awaitingPlayerResponse = false;
+
+    public TMP_InputField playerInputField;
+
+    public void OnSubmitButtonClicked()
+    {
+        string input = playerInputField.text;
+        OnPlayerSubmitResponse(input);
+    }
+
+    void Start()
+    {
+        StockPriceDisplay.Instance.Initialize("LLMG", stockPriceStart);
+        StartCoroutine(GameLoop());
+    }
+
+    IEnumerator GameLoop()
+    {
+        while (true)
+        {
+            // 1. Company action
+            yield return RequestCompanyAction();
+
+            // 2. Player action
+            awaitingPlayerResponse = true;
+            Debug.Log("Waiting for player response...");
+            yield return new WaitUntil(() => awaitingPlayerResponse == false);
+
+            // 3. Public Reaction
+            yield return EvaluatePublicReaction(lastCompanyAction, lastPlayerResponse);
+
+            // 4. Check if game ends
+            if (StockPriceDisplay.Instance.CurrentPrice < stockThreshold)
+            {
+                Debug.Log("Game Over: Stock price fell below threshold.");
+                yield break;
+            }
+
+            yield return new WaitForSeconds(2f); // Optional pacing
+        }
+    }
+
+    public void OnPlayerSubmitResponse(string response)
+    {
+        lastPlayerResponse = response;
+        awaitingPlayerResponse = false;
+    }
+
+    IEnumerator RequestCompanyAction()
+    {
+        string prompt = $"As the board of a public company, decide your next action. Current stock price: {StockPriceDisplay.Instance.CurrentPrice:F2}.";
+        bool isResponseReceived = false;
+
+        UnityToGemini.GeminiResponseCallback += OnCompanyAction;
+        UnityToGemini.Instance.SendNewsRequest(prompt);
+
+        void OnCompanyAction(string responseJson)
+        {
+            var res = UnityToGemini.Instance.UnpackGeminiResponse(responseJson);
+            lastCompanyAction = res.Candidates[0].Contents.Parts[0].Text;
+            Debug.Log("Company action: " + lastCompanyAction);
+            isResponseReceived = true;
+            UnityToGemini.GeminiResponseCallback -= OnCompanyAction;
+        }
+
+        yield return new WaitUntil(() => isResponseReceived);
+    }
+
+    IEnumerator EvaluatePublicReaction(string companyAction, string playerResponse)
+    {
+        string prompt = $"I¡¯m talking to another AI acting as the public/reacting to a CEO¡¯s response. The company recently took this action: {{CompanyAction}}. The CEO responded to media/questions with: {{PlayerResponse}}.\r\n\r\nEvaluate the CEO¡¯s response based on:" +
+            $"\r\n\r\nCrisis Management (Did it address the issue effectively?)" +
+            $"\r\n\r\nTone/PR Skill (Was it confident, empathetic, or tone-deaf?)" +
+            $"\r\n\r\nPublic Perception (How will typical stakeholders react?)." +
+            $"\r\n\r\nReturn:" +
+            $"\r\n\r\nA score from -2 to 2 (INTEGER ONLY), where:" +
+            $"\r\n\r\n-2: Major backlash (e.g., offensive, evasive, or worsening the crisis)" +
+            $"\r\n\r\n-1: Poor response (e.g., weak justification, minor tone-deafness, or lukewarm damage control)" +
+            $"\r\n\r\n0: Neutral/no impact (e.g., generic corporate speak, neither harm nor gain)" +
+            $"\r\n\r\n1: Good save (e.g., solid reasoning, timely apology, or partial trust restoration)" +
+            $"\r\n\r\n2: Brilliant save (e.g., transformative framing, inspiring accountability, or viral positivity)" +
+            $"\r\n\r\nA short public reaction (e.g., headlines, social media buzz)." +
+            $"\r\n\r\nFormat output as:" +
+            $"\r\n\r\njson\r\n{{\"saveQuality\": YourScoreHere, \"publicReaction\": \"Your prediction here\"}}  \r\n";
+        bool isResponseReceived = false;
+
+        UnityToGemini.GeminiResponseCallback += OnPublicReaction;
+        UnityToGemini.Instance.SendNewsRequest(prompt);
+
+        void OnPublicReaction(string responseJson)
+        {
+            var res = UnityToGemini.Instance.UnpackGeminiResponse(responseJson);
+            string reaction = res.Candidates[0].Contents.Parts[0].Text.ToLower();
+            Debug.Log("Public reaction: " + reaction);
+
+            float delta = reaction.Contains("up") ? stockPriceChangeMagnitude : -stockPriceChangeMagnitude;
+            float newPrice = Mathf.Max(0.01f, StockPriceDisplay.Instance.CurrentPrice + delta);
+            StockPriceDisplay.Instance.UpdatePrice(newPrice);
+
+            isResponseReceived = true;
+            UnityToGemini.GeminiResponseCallback -= OnPublicReaction;
+        }
+
+        yield return new WaitUntil(() => isResponseReceived);
+    }
+}

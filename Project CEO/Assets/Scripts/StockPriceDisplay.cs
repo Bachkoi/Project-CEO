@@ -15,13 +15,25 @@ public class StockPriceDisplay : MonoBehaviour
     
     [SerializeField] private int maxDataPoints = 50;
     private List<StockPricePoint> priceHistory = new List<StockPricePoint>();
-    
+
+    private static StockPriceDisplay _instance;
+
     private float currentPrice;
     private string stockSymbol;
     private float chartMinPrice;
     private float chartMaxPrice;
     
     public float CurrentPrice => currentPrice;
+
+    public static StockPriceDisplay Instance { get => _instance; set => _instance = value; }
+
+    public void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+    }
 
     public void Initialize(string symbol, float initialPrice)
     {
