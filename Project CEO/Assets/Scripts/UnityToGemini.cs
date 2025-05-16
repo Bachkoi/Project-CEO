@@ -53,15 +53,19 @@ public class UnityToGemini : MonoBehaviour
         }
         else if (Instance != this)
         {
-            Instance.apiKey = apiKey;
-            Instance.url = url;
-            Instance.lastJsonRequest = lastJsonRequest;
-            Instance.stockPriceCanvas = stockPriceCanvas;
-            Instance.spDisplay = spDisplay;
-            Instance.companyDescription = companyDescription;
-            Instance.companyName = companyName;
-            Instance.UILRTEst = UILRTEst;
-            Instance.OGPrompt = OGPrompt;
+            Instance.apiKey ??= apiKey;
+            Instance.url ??= url;
+            Instance.lastJsonRequest ??= lastJsonRequest;
+            Instance.stockPriceCanvas ??= stockPriceCanvas;
+            Instance.spDisplay ??= spDisplay;
+            Instance.companyDescription ??= companyDescription;
+            Instance.companyName ??= companyName;
+            Instance.UILRTEst ??= UILRTEst;
+            Instance.OGPrompt ??= OGPrompt;
+            Instance.cm ??= cm;
+            Instance.UILRTEst ??= UILRTEst;
+            Instance.stockPriceCanvas ??= stockPriceCanvas;
+            Destroy(gameObject);
         }
         else
         {
@@ -103,29 +107,33 @@ public class UnityToGemini : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-         if (Input.GetKeyDown(KeyCode.L) && apiKey != null)
-         {
-             //StartCoroutine(SendRequestWithDropdown(questionToAsk, interrogationType, timeToAsk));
-         }
+        if (!String.IsNullOrEmpty(apiKey))
+        {
+            if (Input.GetKeyDown(KeyCode.L) && apiKey != null)
+            {
+                //StartCoroutine(SendRequestWithDropdown(questionToAsk, interrogationType, timeToAsk));
+            }
         
-         if (Input.GetKeyDown(KeyCode.P))
-         {
-             float newPrice = spDisplay.CurrentPrice + Random.Range(-5f, 5f);
-             spDisplay.UpdatePrice(newPrice);
-             UILRTEst.ToggleColor();
-             //StartCoroutine(SendKeyValidationToGemini(apiKey));
-         }
+            if (Input.GetKeyDown(KeyCode.P))
+            {
+                float newPrice = spDisplay.CurrentPrice + Random.Range(-5f, 5f);
+                spDisplay.UpdatePrice(newPrice);
+                UILRTEst.ToggleColor();
+                //StartCoroutine(SendKeyValidationToGemini(apiKey));
+            }
 
-         if (Input.GetKeyDown(KeyCode.C))
-         {
-             cm.SwitchCamera();
-         }
+            if (Input.GetKeyDown(KeyCode.C))
+            {
+                cm.SwitchCamera();
+            }
         
-         if(Input.GetKeyDown(KeyCode.Escape))
-         {
+            if(Input.GetKeyDown(KeyCode.Escape))
+            {
              
-            //interrogationCanvas.GetComponent<InterrogationCanvas>().OpenMenu();
-         }
+                //interrogationCanvas.GetComponent<InterrogationCanvas>().OpenMenu();
+            }
+        }
+
     }
 
     public void SendRequest(){

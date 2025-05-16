@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class MenuManager : MonoBehaviour
@@ -29,6 +30,9 @@ public class MenuManager : MonoBehaviour
         
         // Display status message if component exists
         UpdateStatusText("Please enter your Gemini API key and company information to continue.");
+        
+        startBtn.onClick.AddListener(GoToL1);
+        
     }
     
     void OnEnable()
@@ -159,6 +163,11 @@ public class MenuManager : MonoBehaviour
             statusText.text = message;
         else
             Debug.Log(message);
+    }
+
+    public void GoToL1()
+    {
+        SceneManager.LoadScene("GameState_L1");
     }
 
     // Update is called once per frame

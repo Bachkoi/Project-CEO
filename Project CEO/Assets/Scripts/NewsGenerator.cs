@@ -45,18 +45,18 @@ public class NewsGenerator : MonoBehaviour
     private void OnEnable()
     {
         UnityToGemini.GeminiResponseCallback += UnpackNewsResponse;
-        PanelManager.switchPanel += OnSwitchPanel;
+        //PanelManager.switchPanel += OnSwitchPanel;
     }
 
     private void OnDisable()
     {
         UnityToGemini.GeminiResponseCallback -= UnpackNewsResponse;
-        PanelManager.switchPanel -= OnSwitchPanel;
+        //PanelManager.switchPanel -= OnSwitchPanel;
     }
 
     void Start()
     {
-        panelManager = FindObjectOfType<PanelManager>();
+        //panelManager = FindObjectOfType<PanelManager>();
         if (newsTitleText != null)
         {
             // Force TextMeshPro to update its layout
@@ -225,11 +225,12 @@ public class NewsGenerator : MonoBehaviour
                 if (updatePending && completedOneCycle)
                 {
                     Debug.Log("Applying pending news update after cycle completion");
+                    StartCoroutine(ShowBreakingNews(breakingNewsContainer.transform));
 
-                    if (panelManager.activePanel != 2)
-                    {
-                        StartCoroutine(ShowBreakingNews(breakingNewsContainer.transform));
-                    }
+                    //if (panelManager.activePanel != 2)
+                    //{
+                    //    StartCoroutine(ShowBreakingNews(breakingNewsContainer.transform));
+                    //}
                     
                     // Update the text with the pending news
                     newsTitleText.text = pendingNewsText;
@@ -583,6 +584,14 @@ public class NewsGenerator : MonoBehaviour
         {
             time += Time.deltaTime;
             t.localScale = Vector3.Lerp(Vector3.zero, Vector3.one, time);
+            yield return new WaitForEndOfFrame();
+        }
+        yield return new WaitForSeconds(2);
+        time = 0;
+        while (t.localScale.x > 0)
+        {
+            time += Time.deltaTime;
+            t.localScale = Vector3.Lerp(Vector3.one, Vector3.zero, time);
             yield return new WaitForEndOfFrame();
         }
     }
