@@ -30,6 +30,8 @@ public class UnityToGemini : MonoBehaviour
     [BoxGroup("Company Info")]
     public string companyName;
     public string companyDescription;
+
+    public CameraManager cm;
     
 
 
@@ -73,16 +75,16 @@ public class UnityToGemini : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        if (spDisplay != null)
-        {
-            // Example usage
-            spDisplay = stockPriceCanvas?.GetComponent<StockPriceDisplay>();
-            spDisplay?.Initialize("AAPL", 150.00f);
-
-        
-            // Later, to update the price (this will automatically update the chart)
-            spDisplay?.UpdatePrice(155.50f);
-        }
+        //if (spDisplay != null)
+        //{
+        //    // Example usage
+        //    spDisplay = stockPriceCanvas?.GetComponent<StockPriceDisplay>();
+        //    spDisplay?.Initialize("AAPL", 150.00f);
+        //
+        //
+        //    // Later, to update the price (this will automatically update the chart)
+        //    spDisplay?.UpdatePrice(155.50f);
+        //}
 
 
         
@@ -112,6 +114,11 @@ public class UnityToGemini : MonoBehaviour
              spDisplay.UpdatePrice(newPrice);
              UILRTEst.ToggleColor();
              //StartCoroutine(SendKeyValidationToGemini(apiKey));
+         }
+
+         if (Input.GetKeyDown(KeyCode.C))
+         {
+             cm.SwitchCamera();
          }
         
          if(Input.GetKeyDown(KeyCode.Escape))
