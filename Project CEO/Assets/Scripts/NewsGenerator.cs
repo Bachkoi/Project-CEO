@@ -34,22 +34,29 @@ public class NewsGenerator : MonoBehaviour
     [SerializeField]
     private bool showDebugLines = true; // Toggle to show debug lines
 
+    [SerializeField] protected GameObject breakingNewsContainer;
+
     [SerializeField, BoxGroup("Prompt"), TextArea(7, 7)] private string newsPrompt;
     [SerializeField, BoxGroup("Prompt"), TextArea(7, 7)] private string updatedNewsPrompt;
     [SerializeField, BoxGroup("Prompt"), ReadOnly] private List<string> generatedActions = new List<string>();
+    
+    [SerializeField, ReadOnly] private PanelManager panelManager;
 
     private void OnEnable()
     {
         UnityToGemini.GeminiResponseCallback += UnpackNewsResponse;
+        PanelManager.switchPanel += OnSwitchPanel;
     }
 
     private void OnDisable()
     {
         UnityToGemini.GeminiResponseCallback -= UnpackNewsResponse;
+        PanelManager.switchPanel -= OnSwitchPanel;
     }
 
     void Start()
     {
+        panelManager = FindObjectOfType<PanelManager>();
         if (newsTitleText != null)
         {
             // Force TextMeshPro to update its layout
@@ -211,7 +218,6 @@ public class NewsGenerator : MonoBehaviour
             {
                 position.x = startPositionX;
                 textRectTransform.anchoredPosition = position;
-                Debug.Log($"Reset triggered! Position: {position.x}, Right edge: {position.x + textWidth}");
                 
                 completedOneCycle = true;
                 
@@ -219,6 +225,11 @@ public class NewsGenerator : MonoBehaviour
                 if (updatePending && completedOneCycle)
                 {
                     Debug.Log("Applying pending news update after cycle completion");
+
+                    if (panelManager.activePanel != 2)
+                    {
+                        StartCoroutine(ShowBreakingNews(breakingNewsContainer.transform));
+                    }
                     
                     // Update the text with the pending news
                     newsTitleText.text = pendingNewsText;
@@ -550,5 +561,37 @@ public class NewsGenerator : MonoBehaviour
         }
         
         return text;
+    }
+
+    /// <summary>
+    /// Gradually scales up a transform from zero to its full size, creating a visual "breaking news" animation effect.
+    /// </summary>
+    /// <param name="t">The Transform to be scaled up (typically a UI element for breaking news)</param>
+    /// <returns>IEnumerator for coroutine execution</returns>
+    /// <remarks>
+    /// This coroutine scales the transform by multiplying its current scale by a growth factor each frame.
+    /// The animation continues until the X scale (width) reaches or exceeds 1.0.
+    /// The growth rate is set to 2 times delta time, which provides a balanced animation speed 
+    /// that works well across different frame rates.
+    /// </remarks>
+    IEnumerator ShowBreakingNews(Transform t)
+    {
+        t.gameObject.SetActive(true);
+        t.localScale = Vector3.zero;
+        float time = 0.0f;
+        while (t.localScale.x < 1)
+        {
+            time += Time.deltaTime;
+            t.localScale = Vector3.Lerp(Vector3.zero, Vector3.one, time);
+            yield return new WaitForEndOfFrame();
+        }
+    }
+
+    private void OnSwitchPanel(int panelIndex)
+    {
+        if (panelIndex == 2)
+        {
+            breakingNewsContainer.SetActive(false);
+        }
     }
 }

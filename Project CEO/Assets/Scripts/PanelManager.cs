@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 public class PanelManager : MonoBehaviour
@@ -11,9 +13,12 @@ public class PanelManager : MonoBehaviour
     public GameObject laptopPanel; // 1
     public GameObject newsPanel; // 2
     public GameObject stockPanel; // 3
+    [ReadOnly] public GameObject focusingPanel;
     
     
     public int activePanel;
+    
+    public static event Action<int> switchPanel;
     
     // Start is called before the first frame update
     void Start()
@@ -62,6 +67,8 @@ public class PanelManager : MonoBehaviour
             panels[activePanel].SetActive(false);
             panels[newPanel].SetActive(true);
             activePanel = newPanel;
+            focusingPanel = panels[activePanel];
+            switchPanel?.Invoke(newPanel);
         }
         else
         {

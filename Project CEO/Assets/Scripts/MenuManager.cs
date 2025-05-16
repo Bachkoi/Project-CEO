@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class MenuManager : MonoBehaviour
@@ -15,18 +14,13 @@ public class MenuManager : MonoBehaviour
     [SerializeField] protected TextMeshProUGUI statusText;
     
     private bool isValidating = false;
-
-    [SerializeField] protected string gameSceneName;
     
     void Start()
     {
         // Initialize UI components
         if (startBtn != null)
-        {
             startBtn.interactable = false;
-            startBtn.onClick.AddListener(OnStartButtonClicked);
-        }
-
+        
         if (verifyBtn != null)
             verifyBtn.onClick.AddListener(VerifyApiKey);
         
@@ -167,8 +161,9 @@ public class MenuManager : MonoBehaviour
             Debug.Log(message);
     }
 
-    private void OnStartButtonClicked()
+    // Update is called once per frame
+    void Update()
     {
-        SceneManager.LoadScene(gameSceneName);
+        
     }
 }
