@@ -24,6 +24,7 @@ public class UnityToGemini : MonoBehaviour
     public string objectToAsk;
     public string timeToAsk;
     public string interrogationType;
+    public RaycastDetector raycastDetector;
 
     public StockPriceDisplay spDisplay;
     
@@ -79,6 +80,13 @@ public class UnityToGemini : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        //raycastDetector = GetComponent<RaycastDetector>();
+        //
+        //// Subscribe to events
+        //raycastDetector.onObjectClicked.AddListener(HandleObjectClicked);
+        //raycastDetector.onObjectHovered.AddListener(HandleObjectHovered);
+
+
         //if (spDisplay != null)
         //{
         //    // Example usage
@@ -91,7 +99,7 @@ public class UnityToGemini : MonoBehaviour
         //}
 
 
-        
+
         // Instantiate the InterrogationCanvas prefab
         //GameObject interrogationCanvasPrefab = Resources.Load<GameObject>("Prefabs/InterrogationCanvas");
         //if (interrogationCanvasPrefab != null)
@@ -519,4 +527,15 @@ public class UnityToGemini : MonoBehaviour
         //     
         //     return sanityToLose;
         // }
+        
+        private void HandleObjectClicked(GameObject clickedObject)
+        {
+            Debug.Log($"Clicked on: {clickedObject.name}");
+        }
+
+        private void HandleObjectHovered(GameObject hoveredObject)
+        {
+            Debug.Log($"Hovering over: {hoveredObject.name}");
+        }
+
 }

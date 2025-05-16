@@ -42,7 +42,7 @@ public class CameraManager : MonoBehaviour
         }
         currentCamera = cameras[currentCameraIndex];
         //canvas.GetComponent<Camera>() = currentCamera;
-        //canvas.worldCamera = currentCamera;
+        canvas.worldCamera = currentCamera;
     }
 
     public void SwitchToCamera(int index)
