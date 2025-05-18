@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Analytics;
+using System;
 
 public class GameplayManager : MonoBehaviour
 {
@@ -17,6 +18,8 @@ public class GameplayManager : MonoBehaviour
 
     public TMP_InputField playerInputField;
 
+    public static event Action<string> onPlayerRespond;
+    
     public void OnSubmitButtonClicked()
     {
         string input = playerInputField.text;
@@ -40,6 +43,8 @@ public class GameplayManager : MonoBehaviour
             awaitingPlayerResponse = true;
             Debug.Log("Waiting for player response...");
             yield return new WaitUntil(() => awaitingPlayerResponse == false);
+            onPlayerRespond?.Invoke(lastPlayerResponse);
+            TimeManager.Instance.OnPlayerRespond(lastPlayerResponse);
 
             // 3. Public Reaction
             yield return EvaluatePublicReaction(lastCompanyAction, lastPlayerResponse);
@@ -61,14 +66,35 @@ public class GameplayManager : MonoBehaviour
         awaitingPlayerResponse = false;
     }
 
+    /// <summary>
+    /// Asynchronously requests a company action from the Gemini AI model and waits for a response.
+    /// </summary>
+    /// <returns>An IEnumerator that can be used in a coroutine.</returns>
+    /// <remarks>
+    /// This coroutine performs the following steps:
+    /// 1. Creates a prompt asking the AI to determine the company's next action based on current stock price
+    /// 2. Sets up a temporary event handler to capture the AI's response
+    /// 3. Sends the request to the Gemini API via UnityToGemini service
+    /// 4. Waits until a response is received
+    /// 5. Processes the response by:
+    ///    - Extracting and storing the generated company action
+    ///    - Logging the action for debugging
+    ///    - Unsubscribing from the event to prevent memory leaks
+    /// 
+    /// The returned company action represents a decision made by the AI-simulated company board
+    /// that will influence the game state and require player response.
+    /// </remarks>
     IEnumerator RequestCompanyAction()
     {
+        // Construct the prompt with the current stock price
         string prompt = $"As the board of a public company, decide your next action. Current stock price: {StockPriceDisplay.Instance.CurrentPrice:F2}.";
         bool isResponseReceived = false;
 
+        // Create a local handler function to process the API response
         UnityToGemini.GeminiResponseCallback += OnCompanyAction;
         UnityToGemini.Instance.SendNewsRequest(prompt);
 
+        // Local function that processes the AI response
         void OnCompanyAction(string responseJson)
         {
             var res = UnityToGemini.Instance.UnpackGeminiResponse(responseJson);
@@ -78,12 +104,13 @@ public class GameplayManager : MonoBehaviour
             UnityToGemini.GeminiResponseCallback -= OnCompanyAction;
         }
 
+        // Pause the coroutine until we get a response
         yield return new WaitUntil(() => isResponseReceived);
     }
 
     IEnumerator EvaluatePublicReaction(string companyAction, string playerResponse)
     {
-        string prompt = $"I'm talking to another AI acting as the public/reacting to a CEO��s response. The company recently took this action: {companyAction}. The CEO responded to media/questions with: {playerResponse}.\r\n\r\nEvaluate the CEO's response based on:" +
+        string prompt = $"I'm talking to another AI acting as the public/reacting to a CEOs response. The company recently took this action: {companyAction}. The CEO responded to media/questions with: {playerResponse}.\r\n\r\nEvaluate the CEO's response based on:" +
             $"\r\n\r\nCrisis Management (Did it address the issue effectively?)" +
             $"\r\n\r\nTone/PR Skill (Was it confident, empathetic, or tone-deaf?)" +
             $"\r\n\r\nPublic Perception (How will typical stakeholders react?)." +
