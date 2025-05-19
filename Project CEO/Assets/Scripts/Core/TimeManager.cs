@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEngine;
-
+using System;
 
 public class TimeManager : SerializedMonoBehaviour
 {
@@ -13,6 +13,8 @@ public class TimeManager : SerializedMonoBehaviour
     {
         get => days.Count > 0 ? days[days.Count - 1].Item1 : 0;
     }
+
+    public static event Action<int> onDayChange;
     
     /// <summary>
     /// Static instance of the TimeManager that can be accessed from anywhere.
@@ -68,6 +70,7 @@ public class TimeManager : SerializedMonoBehaviour
         if (days[CurrentDay].Item2.Count >= 3)
         {
             days.Add((CurrentDay+1, new List<string>(){response}));
+            onDayChange?.Invoke(CurrentDay+1);
         }
         else
         {
