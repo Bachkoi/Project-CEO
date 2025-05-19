@@ -629,6 +629,18 @@ PrefabInstance:
       propertyPath: m_Camera
       value: 
       objectReference: {fileID: 1685360849}
+    - target: {fileID: 2530426841891303959, guid: a8b96c9a8918dfc4ea273fcc477f713e, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4014444287121494367, guid: a8b96c9a8918dfc4ea273fcc477f713e, type: 3}
+      propertyPath: segmentColors.Array.data[0].rgba
+      value: 4284175607
+      objectReference: {fileID: 0}
+    - target: {fileID: 4014444287121494367, guid: a8b96c9a8918dfc4ea273fcc477f713e, type: 3}
+      propertyPath: segmentColors.Array.data[1].rgba
+      value: 4287745908
+      objectReference: {fileID: 0}
     - target: {fileID: 6311034091180180979, guid: a8b96c9a8918dfc4ea273fcc477f713e, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -712,6 +724,18 @@ PrefabInstance:
     - target: {fileID: 6339716091267461654, guid: a8b96c9a8918dfc4ea273fcc477f713e, type: 3}
       propertyPath: m_Name
       value: Main Canvas
+      objectReference: {fileID: 0}
+    - target: {fileID: 6507740818850607119, guid: a8b96c9a8918dfc4ea273fcc477f713e, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6507740818850607119, guid: a8b96c9a8918dfc4ea273fcc477f713e, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6507740818850607119, guid: a8b96c9a8918dfc4ea273fcc477f713e, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6755614156285646954, guid: a8b96c9a8918dfc4ea273fcc477f713e, type: 3}
       propertyPath: m_AnchorMax.y

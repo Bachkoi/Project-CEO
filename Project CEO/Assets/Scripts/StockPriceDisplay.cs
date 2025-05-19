@@ -104,8 +104,8 @@ public class StockPriceDisplay : MonoBehaviour
         float maxIndex = maxDataPoints - 1;
 
         // Define colors
-        Color32 increaseColor = new Color32(0, 255, 0, 255);
-        Color32 decreaseColor = new Color32(255, 0, 0, 255);
+        Color32 increaseColor = new Color32(116, 207, 145, 255);
+        Color32 decreaseColor = new Color32(247, 84, 91, 255);
 
         for (int i = 0; i < priceHistory.Count; i++)
         {
