@@ -1,4 +1,5 @@
 using UnityEngine;
+using System;
 
 public class CameraManager : MonoBehaviour
 {
@@ -7,6 +8,8 @@ public class CameraManager : MonoBehaviour
     public Camera currentCamera;
     public Canvas canvas;
 
+    public static event Action<int> onChangeCamera;
+    
     private void Start()
     {
         // Disable all cameras except the first one
@@ -41,6 +44,7 @@ public class CameraManager : MonoBehaviour
             cameras[currentCameraIndex].gameObject.SetActive(true);
         }
         currentCamera = cameras[currentCameraIndex];
+        onChangeCamera?.Invoke(currentCameraIndex);
         //canvas.GetComponent<Camera>() = currentCamera;
         canvas.worldCamera = currentCamera;
     }

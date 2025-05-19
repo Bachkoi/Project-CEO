@@ -46,12 +46,14 @@ public class NewsGenerator : MonoBehaviour
     {
         UnityToGemini.GeminiResponseCallback += UnpackNewsResponse;
         //PanelManager.switchPanel += OnSwitchPanel;
+        CameraManager.onChangeCamera += OnChangeCamera;
     }
 
     private void OnDisable()
     {
         UnityToGemini.GeminiResponseCallback -= UnpackNewsResponse;
         //PanelManager.switchPanel -= OnSwitchPanel;
+        CameraManager.onChangeCamera -= OnChangeCamera;
     }
 
     void Start()
@@ -596,6 +598,14 @@ public class NewsGenerator : MonoBehaviour
         }
     }
 
+    private void OnChangeCamera(int cameraIndex)
+    {
+        if (cameraIndex == 2)
+        {
+            breakingNewsContainer.SetActive(false);
+        }
+    }
+    
     private void OnSwitchPanel(int panelIndex)
     {
         if (panelIndex == 2)

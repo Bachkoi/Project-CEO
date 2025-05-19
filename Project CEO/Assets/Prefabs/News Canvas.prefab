@@ -100,7 +100,7 @@ RectTransform:
   m_GameObject: {fileID: 1430233428796253205}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.35, y: 0.35, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 3270699600487128964}
@@ -112,7 +112,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.000030518, y: 0.0025024}
+  m_AnchoredPosition: {x: -236, y: 113}
   m_SizeDelta: {x: 1920, y: 1079.3}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &2205622852226182830
@@ -148,7 +148,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: -235.99997, y: 113}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &2212716081691934129
@@ -690,7 +690,7 @@ RectTransform:
   m_GameObject: {fileID: 5586309487736137074}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2877466349415116144}
@@ -747,7 +747,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 0
+  m_PresetInfoIsWorld: 1
 --- !u!114 &683366100753782409
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -778,11 +778,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   newsTitleText: {fileID: 3947827198603865384}
-  scrollSpeed: 20
+  scrollSpeed: 100
   resetPositionX: -12.35
   startPositionX: 1629.5
   debugLineColor: {r: 0, g: 0, b: 1, a: 1}
-  showDebugLines: 0
+  showDebugLines: 1
   breakingNewsContainer: {fileID: 2205622852226182830}
   newsPrompt: "We are playing a game. I have a company called {0} that {1}. Your
     job is to generate a headline of an action that my company is taking. This is

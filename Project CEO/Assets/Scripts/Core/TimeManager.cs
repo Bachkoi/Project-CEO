@@ -38,20 +38,40 @@ public class TimeManager : SerializedMonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Records a player's response and manages the game's day progression system.
+    /// </summary>
+    /// <param name="response">The player's response text to be recorded</param>
+    /// <remarks>
+    /// This method has two main functions:
+    /// 1. It tracks player responses by storing them in a data structure organized by game days
+    /// 2. It handles day progression logic when the maximum responses per day is reached
+    /// 
+    /// The method follows these steps:
+    /// - If no days exist yet, it creates the first day entry with an empty response list
+    /// - If the current day already has 3 or more responses, it creates a new day and adds the response there
+    /// - Otherwise, it adds the response to the current day's list
+    /// 
+    /// This system allows the game to maintain a history of player interactions and
+    /// automatically progress time when enough interactions have occurred.
+    /// </remarks>
     public void OnPlayerRespond(string response)
     {
+        // If no days exist yet, initialize the first day
         if (days.Count <= 0)
         {
             days.Add((CurrentDay, new List<string>()));
         }
-
+    
+        // If the current day has reached the maximum responses (3), 
+        // advance to the next day and add the response there
         if (days[CurrentDay].Item2.Count >= 3)
         {
             days.Add((CurrentDay+1, new List<string>(){response}));
         }
         else
         {
-            UnityEngine.Debug.Log("Addingf");
+            // Otherwise, add the response to the current day's list
             days[CurrentDay].Item2.Add(response);
         }
     }
