@@ -115,20 +115,21 @@ public class GameplayManager : MonoBehaviour
 
     IEnumerator EvaluatePublicReaction(string companyAction, string playerResponse)
     {
-        string prompt = $"I'm talking to another AI acting as the public/reacting to a CEOs response. The company recently took this action: {companyAction}. The CEO responded to media/questions with: {playerResponse}.\r\n\r\nEvaluate the CEO's response based on:" +
-            $"\r\n\r\nCrisis Management (Did it address the issue effectively?)" +
-            $"\r\n\r\nTone/PR Skill (Was it confident, empathetic, or tone-deaf?)" +
-            $"\r\n\r\nPublic Perception (How will typical stakeholders react?)." +
-            $"\r\n\r\nReturn:" +
-            $"\r\n\r\nA score from -2 to 2 (INTEGER ONLY), where:" +
-            $"\r\n\r\n-2: Major backlash (e.g., offensive, evasive, or worsening the crisis)" +
-            $"\r\n\r\n-1: Poor response (e.g., weak justification, minor tone-deafness, or lukewarm damage control)" +
-            $"\r\n\r\n0: Neutral/no impact (e.g., generic corporate speak, neither harm nor gain)" +
-            $"\r\n\r\n1: Good save (e.g., solid reasoning, timely apology, or partial trust restoration)" +
-            $"\r\n\r\n2: Brilliant save (e.g., transformative framing, inspiring accountability, or viral positivity)" +
-            $"\r\n\r\nA short public reaction (e.g., headlines, social media buzz)." +
-            $"\r\n\r\nFormat output as:" +
-            $"\r\n\r\njson\r\n{{\"saveQuality\": YourScoreHere, \"publicReaction\": \"Your prediction here\"}}  \r\n";
+        //string prompt = $"I'm talking to another AI acting as the public/reacting to a CEOs response. The company recently took this action: {companyAction}. The CEO responded to media/questions with: {playerResponse}.\r\n\r\nEvaluate the CEO's response based on:" +
+        //    $"\r\n\r\nCrisis Management (Did it address the issue effectively?)" +
+        //    $"\r\n\r\nTone/PR Skill (Was it confident, empathetic, or tone-deaf?)" +
+        //    $"\r\n\r\nPublic Perception (How will typical stakeholders react?)." +
+        //    $"\r\n\r\nReturn:" +
+        //    $"\r\n\r\nA score from -2 to 2 (INTEGER ONLY), where:" +
+        //    $"\r\n\r\n-2: Major backlash (e.g., offensive, evasive, or worsening the crisis)" +
+        //    $"\r\n\r\n-1: Poor response (e.g., weak justification, minor tone-deafness, or lukewarm damage control)" +
+        //    $"\r\n\r\n0: Neutral/no impact (e.g., generic corporate speak, neither harm nor gain)" +
+        //    $"\r\n\r\n1: Good save (e.g., solid reasoning, timely apology, or partial trust restoration)" +
+        //    $"\r\n\r\n2: Brilliant save (e.g., transformative framing, inspiring accountability, or viral positivity)" +
+        //    $"\r\n\r\nA short public reaction (e.g., headlines, social media buzz)." +
+        //    $"\r\n\r\nFormat output as:" +
+        //    $"\r\n\r\njson\r\n{{\"saveQuality\": YourScoreHere, \"publicReaction\": \"Your prediction here\"}}  \r\n";
+        string prompt = $"I’m talking to another AI acting as the public/reacting to a CEO’s response. The company recently took this action: {companyAction}. The CEO responded to media/questions with: {playerResponse}. Evaluate the CEO’s response based on: Crisis Management (Did it address the issue effectively?), Tone/PR Skill (Was it confident, empathetic, or tone-deaf?), Public Perception (How will typical stakeholders react?).\nYou will score their response on a score from -2 to 2 (INTEGER ONLY), where: -2 is backlash, -1 is Poor response, 0 is Neutral/no impact, 1 is Good save, 2 is Great save and a SHORT public reaction (e.g., headlines, social media buzz). Please return it as a json with the following output: {{\"saveQuality\": YourScoreHere, \"publicReaction\": \"Your prediction here\"}}\n";
         bool isResponseReceived = false;
 
         UnityToGemini.GeminiResponseCallback += OnPublicReaction;
@@ -143,12 +144,12 @@ public class GameplayManager : MonoBehaviour
             //float delta = reaction.Contains("up") ? stockPriceChangeMagnitude : -stockPriceChangeMagnitude;
             if (reaction.Contains("-2"))
             {
-                delta = -stockPriceChangeMagnitude;
+                delta = -stockPriceChangeMagnitude/2.0f;
 
             }
             else if (reaction.Contains("-1"))
             {
-                delta = -stockPriceChangeMagnitude/2.0f;
+                delta = -stockPriceChangeMagnitude/4.0f;
 
             }
             else if (reaction.Contains("0"))
