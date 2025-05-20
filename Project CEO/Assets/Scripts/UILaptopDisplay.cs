@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -12,6 +13,16 @@ public class UILaptopDisplay : MonoBehaviour
     public GameObject playerBubblePrefab;
     public GameObject journalistBubblePrefab;
     public Button sendButton;
+
+    private void OnEnable()
+    {
+        NewsGenerator.onNewsGenerated += LaptopOnNewsGenerated;
+    }
+
+    private void OnDisable()
+    {
+        NewsGenerator.onNewsGenerated -= LaptopOnNewsGenerated;
+    }
 
     private void Start()
     {
@@ -36,6 +47,11 @@ public class UILaptopDisplay : MonoBehaviour
         inputField.text = "";
     }
 
+    public void LaptopOnNewsGenerated(string news)
+    {
+        sendButton.enabled = true;
+        AddJournalistDialog(news);
+    }
 
     private void AddPlayerDialog()
     {
@@ -53,7 +69,9 @@ public class UILaptopDisplay : MonoBehaviour
             dialogText.text = message;
         }
 
-        // Optional: clear input field after sending
+        //clear input field after sending
         inputField.text = "";
+
+        sendButton.enabled = false;
     }
 }

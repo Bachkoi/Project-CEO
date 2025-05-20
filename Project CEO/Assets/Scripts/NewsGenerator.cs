@@ -42,6 +42,8 @@ public class NewsGenerator : MonoBehaviour
     
     [SerializeField, ReadOnly] private PanelManager panelManager;
 
+    public static Action<string> onNewsGenerated;
+
     private void OnEnable()
     {
         UnityToGemini.GeminiResponseCallback += UnpackNewsResponse;
@@ -228,12 +230,13 @@ public class NewsGenerator : MonoBehaviour
                 {
                     Debug.Log("Applying pending news update after cycle completion");
                     StartCoroutine(ShowBreakingNews(breakingNewsContainer.transform));
+                    onNewsGenerated.Invoke(pendingNewsText);
 
                     //if (panelManager.activePanel != 2)
                     //{
                     //    StartCoroutine(ShowBreakingNews(breakingNewsContainer.transform));
                     //}
-                    
+
                     // Update the text with the pending news
                     newsTitleText.text = pendingNewsText;
                     newsTitleText.ForceMeshUpdate();
@@ -442,6 +445,7 @@ public class NewsGenerator : MonoBehaviour
                     if (!isScrollingActive && !string.IsNullOrWhiteSpace(newsHeadline))
                     {
                         StartScrollingIfNeeded();
+                        onNewsGenerated.Invoke(newsHeadline);
                     }
                 }
                 else
