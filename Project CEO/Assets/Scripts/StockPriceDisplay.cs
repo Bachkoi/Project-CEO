@@ -32,6 +32,7 @@ public class StockPriceDisplay : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
+            UpdatePrice(currentPrice);
         }
     }
 
