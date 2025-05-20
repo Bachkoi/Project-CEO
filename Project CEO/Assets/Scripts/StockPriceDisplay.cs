@@ -18,7 +18,7 @@ public class StockPriceDisplay : MonoBehaviour
 
     private static StockPriceDisplay _instance;
 
-    private float currentPrice;
+    public  float currentPrice;
     private string stockSymbol;
     private float chartMinPrice;
     private float chartMaxPrice;
@@ -34,6 +34,12 @@ public class StockPriceDisplay : MonoBehaviour
             Instance = this;
             UpdatePrice(currentPrice);
         }
+    }
+    
+    public void Start()
+    {
+        // Initialize the chart
+        UpdatePrice(currentPrice);
     }
 
     public void Initialize(string symbol, float initialPrice)
