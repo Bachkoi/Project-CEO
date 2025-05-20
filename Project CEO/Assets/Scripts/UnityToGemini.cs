@@ -120,18 +120,18 @@ public class UnityToGemini : MonoBehaviour
                 //StartCoroutine(SendRequestWithDropdown(questionToAsk, interrogationType, timeToAsk));
             }
         
-            if (Input.GetKeyDown(KeyCode.P))
-            {
-                float newPrice = spDisplay.CurrentPrice + Random.Range(-5f, 5f);
-                spDisplay.UpdatePrice(newPrice);
-                UILRTEst.ToggleColor();
-                //StartCoroutine(SendKeyValidationToGemini(apiKey));
-            }
+            //if (Input.GetKeyDown(KeyCode.P))
+            //{
+            //    float newPrice = spDisplay.CurrentPrice + Random.Range(-5f, 5f);
+            //    spDisplay.UpdatePrice(newPrice);
+            //    UILRTEst.ToggleColor();
+            //    //StartCoroutine(SendKeyValidationToGemini(apiKey));
+            //}
 
-            if (Input.GetKeyDown(KeyCode.C))
-            {
-                cm.SwitchCamera();
-            }
+            //if (Input.GetKeyDown(KeyCode.C))
+            //{
+            //    cm.SwitchCamera();
+            //}
         
             if(Input.GetKeyDown(KeyCode.Escape))
             {

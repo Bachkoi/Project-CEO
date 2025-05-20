@@ -15,6 +15,8 @@ public class GameplayManager : MonoBehaviour
     private string lastPlayerResponse;
 
     private bool awaitingPlayerResponse = false;
+    
+    public NewsGenerator newsGenerator;
 
     public TMP_InputField playerInputField;
 
@@ -37,6 +39,7 @@ public class GameplayManager : MonoBehaviour
         while (true)
         {
             // 1. Company action
+            
             yield return RequestCompanyAction();
 
             // 2. Player action
@@ -87,7 +90,9 @@ public class GameplayManager : MonoBehaviour
     IEnumerator RequestCompanyAction()
     {
         // Construct the prompt with the current stock price
-        string prompt = $"As the board of a public company, decide your next action. Current stock price: {StockPriceDisplay.Instance.CurrentPrice:F2}.";
+        //string prompt = $"As the board of a public company, decide your next action. Current stock price: {StockPriceDisplay.Instance.CurrentPrice:F2}.";
+        newsGenerator.UpdatePrompt();
+        string prompt = newsGenerator.UpdatedNewsPrompt;
         bool isResponseReceived = false;
 
         // Create a local handler function to process the API response
@@ -134,8 +139,33 @@ public class GameplayManager : MonoBehaviour
             var res = UnityToGemini.Instance.UnpackGeminiResponse(responseJson);
             string reaction = res.Candidates[0].Contents.Parts[0].Text.ToLower();
             Debug.Log("Public reaction: " + reaction);
+            float delta = 0.0f;
+            //float delta = reaction.Contains("up") ? stockPriceChangeMagnitude : -stockPriceChangeMagnitude;
+            if (reaction.Contains("-2"))
+            {
+                delta = -stockPriceChangeMagnitude;
 
-            float delta = reaction.Contains("up") ? stockPriceChangeMagnitude : -stockPriceChangeMagnitude;
+            }
+            else if (reaction.Contains("-1"))
+            {
+                delta = -stockPriceChangeMagnitude/2.0f;
+
+            }
+            else if (reaction.Contains("0"))
+            {
+                delta = stockPriceChangeMagnitude/4.0f;
+
+            }
+            else if (reaction.Contains("1"))
+            {
+                delta = stockPriceChangeMagnitude/2.0f;
+
+            }
+            else
+            {
+                delta = stockPriceChangeMagnitude;
+
+            }
             float newPrice = Mathf.Max(0.01f, StockPriceDisplay.Instance.CurrentPrice + delta);
             StockPriceDisplay.Instance.UpdatePrice(newPrice);
 

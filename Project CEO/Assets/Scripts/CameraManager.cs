@@ -2,6 +2,7 @@ using UnityEngine;
 using System;
 using System.Collections;
 using Cinemachine;
+using UnityEngine.UI;
 
 public class CameraManager : MonoBehaviour
 {
@@ -10,6 +11,9 @@ public class CameraManager : MonoBehaviour
     private int currentCameraIndex = 0;
     public Camera currentCamera;
     public Canvas canvas;
+
+    public Button[] buttons;
+    
 
     [SerializeField] Vector3[] defaultPositions;
     //public Vector3[] defaultRotations;
@@ -38,6 +42,7 @@ public class CameraManager : MonoBehaviour
             currentCamera = cameras[currentCameraIndex];
             canvas.worldCamera = currentCamera;
         }
+        EnableButtons(0);
     }
 
     public void SwitchCamera()
@@ -95,6 +100,7 @@ public class CameraManager : MonoBehaviour
             canvas.worldCamera = currentCamera;
         }
         CameraReset(prevCamera, previousCameraIndex);
+        EnableButtons(currentCameraIndex);
 
         onChangeCamera?.Invoke(currentCameraIndex);
     }
@@ -160,6 +166,7 @@ public class CameraManager : MonoBehaviour
             canvas.worldCamera = currentCamera;
         }
         CameraReset(cameras[previousIndex], previousIndex);
+        EnableButtons(currentCameraIndex);
         onChangeCamera?.Invoke(currentCameraIndex);
     }
 
@@ -170,5 +177,22 @@ public class CameraManager : MonoBehaviour
         pCam.transform.position = defaultPositions[pIndex];
         //pCam.transform.rotation = defaultRotations[pIndex];
         pCam.fieldOfView = defaultFOVs[pIndex];
+    }
+
+    public void EnableButtons(int pIndex)
+    {
+        Debug.Log("Enabling Buttons for: " + pIndex);
+        for (int i = 0; i < buttons.Length; i++)
+        {
+            if (i == pIndex * 3 || i == pIndex * 3 + 1 || i == pIndex * 3 + 2)
+            {
+                buttons[i].gameObject.SetActive(true);
+            }
+            else
+            {
+                buttons[i].gameObject.SetActive(false);
+
+            }
+        }
     }
 }

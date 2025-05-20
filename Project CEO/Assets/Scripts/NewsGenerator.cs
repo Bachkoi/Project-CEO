@@ -41,6 +41,8 @@ public class NewsGenerator : MonoBehaviour
     [SerializeField, BoxGroup("Prompt"), ReadOnly] private List<string> generatedActions = new List<string>();
     
     [SerializeField, ReadOnly] private PanelManager panelManager;
+    
+    public string UpdatedNewsPrompt { get => updatedNewsPrompt; set => updatedNewsPrompt = value; }
 
     public static Action<string> onNewsGenerated;
 
@@ -103,14 +105,15 @@ public class NewsGenerator : MonoBehaviour
             DrawDebugLines();
         }
 
-        if (Input.GetKeyDown(KeyCode.O))
-        {
-            UpdatePrompt();
-            UnityToGemini.Instance.SendNewsRequest(updatedNewsPrompt);
-        }
+        //if (Input.GetKeyDown(KeyCode.O))
+        //{
+        //    UpdatePrompt();
+        //    
+        //    UnityToGemini.Instance.SendNewsRequest(updatedNewsPrompt);
+        //}
     }
 
-    private void UpdatePrompt()
+    public void UpdatePrompt()
     {
         if (!string.IsNullOrEmpty(newsPrompt))
         {
