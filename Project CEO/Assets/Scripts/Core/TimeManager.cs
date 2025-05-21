@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using System;
+using TMPro;
 
 public class TimeManager : SerializedMonoBehaviour
 {
     public List<(int, List<string>)> days = new List<(int time, List<string> playerResponses)>();
     public int currentWeek = 0;
+
+    [SerializeField] private TextMeshProUGUI timePopupText;
     
     
     //getters & setters

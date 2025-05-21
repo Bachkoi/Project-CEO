@@ -125,7 +125,7 @@ Canvas:
   m_GameObject: {fileID: 5248843195062330527}
   m_Enabled: 1
   serializedVersion: 3
-  m_RenderMode: 0
+  m_RenderMode: 1
   m_Camera: {fileID: 0}
   m_PlaneDistance: 100
   m_PixelPerfect: 0
@@ -137,7 +137,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 0
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 3
   m_TargetDisplay: 0
 --- !u!114 &2250001599511901537
 MonoBehaviour:
@@ -290,7 +290,8 @@ MonoBehaviour:
   clip_vibrating: {fileID: 8300000, guid: 20eba60232a91bb4f8496df00475b5ea, type: 3}
   emojiImage: {fileID: 189620701594660464}
   emojiSprites:
-  - {fileID: 21300000, guid: eed237e2c53f4a541b348518c8ed40f3, type: 3}
-  - {fileID: 21300000, guid: 290d9b0c6af9b834287250a60d1b8d6b, type: 3}
-  - {fileID: 21300000, guid: df64a6f53e33d9c4c8afb7c8e405abc5, type: 3}
-  - {fileID: 21300000, guid: a0da011202141ab4aaecfd29d10259dd, type: 3}
+  - {fileID: 21300000, guid: 99499c1ae88fa594d93104c16b0911be, type: 3}
+  - {fileID: 21300000, guid: 99499c1ae88fa594d93104c16b0911be, type: 3}
+  - {fileID: 21300000, guid: 4542f4608c083ae44be4ba0354c91aa3, type: 3}
+  - {fileID: 21300000, guid: 4542f4608c083ae44be4ba0354c91aa3, type: 3}
+  - {fileID: 21300000, guid: 4542f4608c083ae44be4ba0354c91aa3, type: 3}

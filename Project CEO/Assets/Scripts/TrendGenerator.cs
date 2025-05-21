@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using Sirenix.OdinInspector;
+using TMPro;
 using UnityEngine;
 
 public class TrendGenerator : MonoBehaviour
@@ -13,6 +14,9 @@ public class TrendGenerator : MonoBehaviour
     [SerializeField, TextArea(7, 7)] private string trendPrompt;
 
     [SerializeField, TextArea(7, 7), ReadOnly] private string updatedTrendPrompt;
+
+    [SerializeField, BoxGroup("UI")] private GameObject trendUIContainer;
+    [SerializeField, BoxGroup("UI")] private TextMeshProUGUI trendText;
     
     //getters & setters
     public string CurrentTrend {get=>trends[trends.Count - 1];}
@@ -83,6 +87,8 @@ public class TrendGenerator : MonoBehaviour
                     
                     // Add the new trend
                     trends.Add(trendText);
+                    this.trendText.text = trendText;
+                    trendUIContainer.SetActive(true);
                     
                     Debug.Log($"New trend added: '{trendText}'");
                 }
