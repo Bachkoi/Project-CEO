@@ -97,10 +97,10 @@ public class GameplayManager : MonoBehaviour
 
         // Create a local handler function to process the API response
         UnityToGemini.GeminiResponseCallback += OnCompanyAction;
-        UnityToGemini.Instance.SendNewsRequest(prompt);
+        UnityToGemini.Instance.SendRequest(prompt, GeminiRequestType.News);
 
         // Local function that processes the AI response
-        void OnCompanyAction(string responseJson)
+        void OnCompanyAction(string responseJson, GeminiRequestType type)
         {
             var res = UnityToGemini.Instance.UnpackGeminiResponse(responseJson);
             lastCompanyAction = res.Candidates[0].Contents.Parts[0].Text;
@@ -133,10 +133,12 @@ public class GameplayManager : MonoBehaviour
         bool isResponseReceived = false;
 
         UnityToGemini.GeminiResponseCallback += OnPublicReaction;
-        UnityToGemini.Instance.SendNewsRequest(prompt);
+        UnityToGemini.Instance.SendRequest(prompt, GeminiRequestType.PublicReaction);
 
-        void OnPublicReaction(string responseJson)
+        void OnPublicReaction(string responseJson, GeminiRequestType type)
         {
+            if (type != GeminiRequestType.PublicReaction)
+                return;
             var res = UnityToGemini.Instance.UnpackGeminiResponse(responseJson);
             string reaction = res.Candidates[0].Contents.Parts[0].Text.ToLower();
             Debug.Log("Public reaction: " + reaction);

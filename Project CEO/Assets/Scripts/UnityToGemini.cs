@@ -9,6 +9,8 @@ using Backend;
 using Sirenix.OdinInspector;
 using Random = UnityEngine.Random;
 
+public enum GeminiRequestType {News, Trend, PublicReaction, None}
+
 public class UnityToGemini : MonoBehaviour
 {
     // Necessary information for Gemini
@@ -42,7 +44,7 @@ public class UnityToGemini : MonoBehaviour
 
     public static UnityToGemini Instance;
     
-    public static event Action<string> GeminiResponseCallback;
+    public static event Action<string, GeminiRequestType> GeminiResponseCallback;
 
     private void Awake()
     {
@@ -141,14 +143,10 @@ public class UnityToGemini : MonoBehaviour
         }
 
     }
-
-    public void SendRequest(){
-        StartCoroutine(SendRequestWithDropdown(questionToAsk, interrogationType, timeToAsk));
-    }
-
-    public void SendNewsRequest(string request)
+    
+    public void SendRequest(string request, GeminiRequestType type)
     {
-        StartCoroutine((SendRequestToGemini(request)));
+        StartCoroutine((SendRequestToGemini(request, type)));
     }
 
     public IEnumerator SendRequestWithDropdown(string question, string interrogationType, string timeDropdown){
@@ -219,7 +217,7 @@ public class UnityToGemini : MonoBehaviour
         //return null;    
     }
 
-    public IEnumerator SendRequestToGemini(string request)
+    public IEnumerator SendRequestToGemini(string request, GeminiRequestType type)
     {
 
        Debug.Log("Started API Validation Request");
@@ -263,7 +261,7 @@ public class UnityToGemini : MonoBehaviour
             }
             else
             {
-                GeminiResponseCallback?.Invoke(www.downloadHandler.text);
+                GeminiResponseCallback?.Invoke(www.downloadHandler.text, type);
                 //TimeManager.Instance.DecrementActionCounter();
                 //Debug.Log("Action Counter: " + TimeManager.Instance.actionCounter);
                 //apiKey = apiInput.Trim();
@@ -309,7 +307,7 @@ public class UnityToGemini : MonoBehaviour
                     Debug.LogError($"API Key validation failed: {www.error}");
                     
                     // Trigger callback with error information so UI can be updated
-                    GeminiResponseCallback?.Invoke("ERROR:" + www.error);
+                    GeminiResponseCallback?.Invoke("ERROR:" + www.error, GeminiRequestType.None);
                 }
                 else
                 {
@@ -318,7 +316,7 @@ public class UnityToGemini : MonoBehaviour
                     Debug.Log("API Key validation successful");
                     
                     // Trigger the callback with the successful response
-                    GeminiResponseCallback?.Invoke(www.downloadHandler.text);
+                    GeminiResponseCallback?.Invoke(www.downloadHandler.text, GeminiRequestType.None);
                 }
             }
     }

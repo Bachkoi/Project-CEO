@@ -13,6 +13,8 @@ public class MenuManager : MonoBehaviour
     [SerializeField] protected Button verifyBtn;
     [SerializeField] protected Button startBtn;
     [SerializeField] protected TextMeshProUGUI statusText;
+
+    [SerializeField] protected string gameStateName;
     
     private bool isValidating = false;
     
@@ -89,7 +91,7 @@ public class MenuManager : MonoBehaviour
         StartCoroutine(UnityToGemini.Instance.SendKeyValidationToGemini(apiKeyField.text));
     }
     
-    private void OnGeminiValidationResponse(string response)
+    private void OnGeminiValidationResponse(string response, GeminiRequestType type)
     {
         // Only process the response if we're currently validating
         if (!isValidating)
@@ -167,7 +169,7 @@ public class MenuManager : MonoBehaviour
 
     public void GoToL1()
     {
-        SceneManager.LoadScene("GameState_L1");
+        SceneManager.LoadScene(gameStateName);
     }
 
     // Update is called once per frame

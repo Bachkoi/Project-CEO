@@ -7,6 +7,8 @@ using System;
 public class TimeManager : SerializedMonoBehaviour
 {
     public List<(int, List<string>)> days = new List<(int time, List<string> playerResponses)>();
+    public int currentWeek = 0;
+    
     
     //getters & setters
     public int CurrentDay
@@ -15,6 +17,7 @@ public class TimeManager : SerializedMonoBehaviour
     }
 
     public static event Action<int> onDayChange;
+    public static event Action<int> onWeekChange;
     
     /// <summary>
     /// Static instance of the TimeManager that can be accessed from anywhere.
@@ -71,6 +74,12 @@ public class TimeManager : SerializedMonoBehaviour
         {
             days.Add((CurrentDay+1, new List<string>(){response}));
             onDayChange?.Invoke(CurrentDay+1);
+
+            if (days.Count != 0 && days.Count % 5 == 0)
+            {
+                currentWeek++;
+                onWeekChange?.Invoke(currentWeek);
+            }
         }
         else
         {

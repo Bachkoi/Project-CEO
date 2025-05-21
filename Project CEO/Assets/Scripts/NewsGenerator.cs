@@ -412,8 +412,10 @@ public class NewsGenerator : MonoBehaviour
     /// Handles Gemini API response format from Backend.GeminiResponse
     /// </summary>
     /// <param name="rawResponse">The raw JSON string to unpack from Gemini API</param>
-    protected void UnpackNewsResponse(string rawResponse)
+    protected void UnpackNewsResponse(string rawResponse, GeminiRequestType type)
     {
+        if (type != GeminiRequestType.News)
+            return;
         try
         {
             // Deserialize the JSON string to NewsResponse object
