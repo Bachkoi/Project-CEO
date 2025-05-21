@@ -21,6 +21,7 @@ public class GameplayManager : MonoBehaviour
     public TMP_InputField playerInputField;
 
     public static event Action<string> onPlayerRespond;
+    public static event Action<string, int> onPublicReact;
     
     public void OnSubmitButtonClicked()
     {
@@ -134,7 +135,7 @@ public class GameplayManager : MonoBehaviour
 
         UnityToGemini.GeminiResponseCallback += OnPublicReaction;
         UnityToGemini.Instance.SendRequest(prompt, GeminiRequestType.PublicReaction);
-
+        
         void OnPublicReaction(string responseJson, GeminiRequestType type)
         {
             if (type != GeminiRequestType.PublicReaction)
@@ -144,25 +145,28 @@ public class GameplayManager : MonoBehaviour
             Debug.Log("Public reaction: " + reaction);
             float delta = 0.0f;
             //float delta = reaction.Contains("up") ? stockPriceChangeMagnitude : -stockPriceChangeMagnitude;
+            int reactScore = 0;
+                
             if (reaction.Contains("-2"))
             {
                 delta = -stockPriceChangeMagnitude/2.0f;
+                reactScore = -2;
 
             }
             else if (reaction.Contains("-1"))
             {
                 delta = -stockPriceChangeMagnitude/4.0f;
-
+                reactScore = -1;
             }
             else if (reaction.Contains("0"))
             {
                 delta = stockPriceChangeMagnitude/4.0f;
-
+                reactScore = 0;
             }
             else if (reaction.Contains("1"))
             {
                 delta = stockPriceChangeMagnitude/2.0f;
-
+                reactScore = 1;
             }
             else
             {
@@ -174,6 +178,8 @@ public class GameplayManager : MonoBehaviour
 
             isResponseReceived = true;
             UnityToGemini.GeminiResponseCallback -= OnPublicReaction;
+            
+            onPublicReact?.Invoke(reaction, reactScore);
         }
 
         yield return new WaitUntil(() => isResponseReceived);
