@@ -629,6 +629,7 @@ MonoBehaviour:
   verifyBtn: {fileID: 8878617877821263120}
   startBtn: {fileID: 2119701892330654932}
   statusText: {fileID: 3657161991623937738}
+  gameStateName: GameState_L1
 --- !u!1 &3331940419892816300
 GameObject:
   m_ObjectHideFlags: 0
