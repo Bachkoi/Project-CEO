@@ -147,6 +147,7 @@ GameObject:
   - component: {fileID: 5361471710184535106}
   - component: {fileID: 3119259571676752081}
   - component: {fileID: 4081607489181537232}
+  - component: {fileID: 7037636532530322359}
   m_Layer: 0
   m_Name: Trend Canvas
   m_TagString: Untagged
@@ -194,6 +195,7 @@ MonoBehaviour:
     Please make sure the new trend is not the same as the generated ones. Don\u2019t
     explain your choice. Please return in JSON format: {Trend:\\\u201Danswer\\\u201D}. "
   updatedTrendPrompt: 
+  trendUIContainer: {fileID: 0}
   trendText: {fileID: 0}
 --- !u!223 &5361471710184535106
 Canvas:
@@ -249,6 +251,23 @@ MonoBehaviour:
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
   m_PresetInfoIsWorld: 0
+--- !u!114 &7037636532530322359
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3251839120649834315}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc42784cf147c0c48a680349fa168899, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IgnoreReversedGraphics: 1
+  m_BlockingObjects: 0
+  m_BlockingMask:
+    serializedVersion: 2
+    m_Bits: 55
 --- !u!1 &3423083931067145663
 GameObject:
   m_ObjectHideFlags: 0

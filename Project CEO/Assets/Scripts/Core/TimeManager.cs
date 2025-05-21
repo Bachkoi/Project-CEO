@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using System;
+using System.Text;
 using TMPro;
 
 public class TimeManager : SerializedMonoBehaviour
@@ -10,6 +11,7 @@ public class TimeManager : SerializedMonoBehaviour
     public List<(int, List<string>)> days = new List<(int time, List<string> playerResponses)>();
     public int currentWeek = 0;
 
+    [SerializeField] private GameObject timePopupContainer;
     [SerializeField] private TextMeshProUGUI timePopupText;
     
     
@@ -77,7 +79,9 @@ public class TimeManager : SerializedMonoBehaviour
         {
             days.Add((CurrentDay+1, new List<string>(){response}));
             onDayChange?.Invoke(CurrentDay+1);
-
+            UpdateTimeText();
+            timePopupContainer.SetActive(true);
+            
             if (days.Count != 0 && days.Count % 5 == 0)
             {
                 currentWeek++;
@@ -89,5 +93,42 @@ public class TimeManager : SerializedMonoBehaviour
             // Otherwise, add the response to the current day's list
             days[CurrentDay].Item2.Add(response);
         }
+    }
+
+    public void UpdateTimeText()
+    {
+        StringBuilder builder = new StringBuilder();
+        builder.Append("Today is week ");
+        builder.Append(currentWeek + 1);
+        switch (CurrentDay % 5)
+        {
+            case 1:
+                builder.Append(" Monday");
+                break;
+            case 2:
+                builder.Append(" Tuesday");
+                break;
+            case 3:
+                builder.Append(" Wednesday");
+                break;
+            case 4:
+                builder.Append(" Thursday");
+                break;
+            case 0:
+                builder.Append(" Friday");
+                break;
+        }
+
+        if (CurrentDay % 5 > 0)
+        {
+            builder.Append(", \nyou still need to keep the company running for ");
+            builder.Append(CurrentDay % 5);
+            builder.Append(" days. ");
+        }
+        else
+        {
+            builder.Append("You can cash out at the end of the day!");
+        }
+        timePopupText.text = builder.ToString();
     }
 }
