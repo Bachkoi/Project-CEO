@@ -988,6 +988,7 @@ MonoBehaviour:
   apiKeyField: {fileID: 1570793770888177741}
   companyNameField: {fileID: 5762796456903584241}
   companyDescriptionField: {fileID: 2365475913849719047}
+  companyAcronymField: {fileID: 4196355846314197353}
   verifyBtn: {fileID: 8878617877821263120}
   startBtn: {fileID: 2119701892330654932}
   statusText: {fileID: 3657161991623937738}

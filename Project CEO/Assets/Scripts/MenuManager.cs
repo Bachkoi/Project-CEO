@@ -93,6 +93,7 @@ public class MenuManager : MonoBehaviour
         apiKeyField.interactable = false;
         companyNameField.interactable = false;
         companyDescriptionField.interactable = false;
+        companyAcronymField.interactable = false;
         UpdateStatusText("Validating API key...");
         
         // Send validation request
@@ -124,6 +125,9 @@ public class MenuManager : MonoBehaviour
                 
             if (companyDescriptionField != null)
                 companyDescriptionField.interactable = true;
+            
+            if (companyAcronymField != null)
+                companyAcronymField.interactable = true;
             
             if (verifyBtn != null && !string.IsNullOrWhiteSpace(apiKeyField.text))
                 verifyBtn.interactable = true;

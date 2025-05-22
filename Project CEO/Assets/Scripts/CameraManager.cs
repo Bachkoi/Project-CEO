@@ -14,6 +14,7 @@ public class CameraManager : MonoBehaviour
     [SerializeField] private Camera[] cameras;
     [SerializeField] private float transitionTime = 1.0f;
     private int currentCameraIndex = 0;
+    private int previousCameraIndex = 0;
     public Camera currentCamera;
     public Canvas canvas;
 
@@ -57,7 +58,7 @@ public class CameraManager : MonoBehaviour
 
     private IEnumerator TransitionToNextCamera()
     {
-        int previousCameraIndex = currentCameraIndex;
+        previousCameraIndex = currentCameraIndex;
         currentCameraIndex = (currentCameraIndex + 1) % cameras.Length;
 
         Camera prevCamera = cameras[previousCameraIndex];
@@ -137,10 +138,10 @@ public class CameraManager : MonoBehaviour
     // Add this new method
     private void CompleteTransitionImmediately(int newIndex)
     {
-        int previousIndex = currentCameraIndex;
+        //int previousIndex = currentCameraIndex;
         currentCameraIndex = newIndex;
 
-        Camera prevCamera = cameras[previousIndex];
+        Camera prevCamera = cameras[previousCameraIndex];
         Debug.Log("Prev Cam: " +prevCamera.name);
         Camera nextCamera = cameras[currentCameraIndex];
         Debug.Log("Next Cam: " + nextCamera.name);
@@ -150,7 +151,7 @@ public class CameraManager : MonoBehaviour
         {
             prevCamera.gameObject.SetActive(false);
             // Reset the previous camera immediately
-            CameraReset(prevCamera, previousIndex);
+            CameraReset(prevCamera, previousCameraIndex);
         }
 
         // Enable and setup new camera
@@ -180,10 +181,10 @@ public class CameraManager : MonoBehaviour
     {
         isTransitioning = true;
 
-        int previousIndex = currentCameraIndex;
+        previousCameraIndex = currentCameraIndex;
         currentCameraIndex = newIndex;
 
-        Camera prevCamera = cameras[previousIndex];
+        Camera prevCamera = cameras[previousCameraIndex];
         Camera nextCamera = cameras[currentCameraIndex];
 
         // Enable next camera but make it fully transparent
@@ -228,7 +229,7 @@ public class CameraManager : MonoBehaviour
             canvas.worldCamera = currentCamera;
         }
 
-        CameraReset(cameras[previousIndex], previousIndex);
+        CameraReset(cameras[previousCameraIndex], previousCameraIndex);
         EnableButtons(currentCameraIndex);
         onChangeCamera?.Invoke(currentCameraIndex);
 
