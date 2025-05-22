@@ -32,7 +32,7 @@ public class UILaptopDisplay : MonoBehaviour
     {
         // Register the button click listener
         sendButton.onClick.AddListener(AddPlayerDialog);
-        LaptopUIInit();
+        //LaptopUIInit();
     }
 
     private static readonly List<string> questionTemplates = new List<string>
