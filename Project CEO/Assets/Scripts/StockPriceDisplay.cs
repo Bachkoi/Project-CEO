@@ -39,6 +39,8 @@ public class StockPriceDisplay : MonoBehaviour
     public void Start()
     {
         // Initialize the chart
+        stockSymbol = UnityToGemini.Instance.companyAcronym;
+        stockSymbolText.text = UnityToGemini.Instance.companyAcronym;
         UpdatePrice(currentPrice);
     }
 

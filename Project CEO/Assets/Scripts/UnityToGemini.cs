@@ -32,6 +32,7 @@ public class UnityToGemini : MonoBehaviour
     [BoxGroup("Company Info")]
     public string companyName;
     public string companyDescription;
+    public string companyAcronym;
 
     public CameraManager cm;
     
@@ -62,6 +63,7 @@ public class UnityToGemini : MonoBehaviour
             Instance.spDisplay ??= spDisplay;
             Instance.companyDescription ??= companyDescription;
             Instance.companyName ??= companyName;
+            Instance.companyAcronym ??= companyAcronym;
             Instance.UILRTEst ??= UILRTEst;
             Instance.OGPrompt ??= OGPrompt;
             Instance.cm ??= cm;
