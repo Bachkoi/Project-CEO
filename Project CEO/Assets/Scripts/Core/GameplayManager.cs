@@ -22,9 +22,24 @@ public class GameplayManager : MonoBehaviour
 
     public static event Action<string> onPlayerRespond;
     public static event Action<string, int> onPublicReact;
-    
+
+    private void OnEnable()
+    {
+        //Submit player input when hitting enter key
+        InputManager.OnEnterKeyDown += OnSubmitButtonClicked;
+    }
+
+    private void OnDisable()
+    {
+        InputManager.OnEnterKeyDown -= OnSubmitButtonClicked;
+    }
+
     public void OnSubmitButtonClicked()
     {
+        if (string.IsNullOrEmpty(playerInputField.text))
+        {
+            return;
+        }
         string input = playerInputField.text;
         OnPlayerSubmitResponse(input);
     }
@@ -32,7 +47,7 @@ public class GameplayManager : MonoBehaviour
     void Start()
     {
         StockPriceDisplay.Instance.Initialize("LLMG", stockPriceStart);
-        StartCoroutine(GameLoop());
+        StartCoroutine(GameLoop());   
     }
 
     IEnumerator GameLoop()
