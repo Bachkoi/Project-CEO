@@ -26,8 +26,11 @@ public class NewsGenerator : MonoBehaviour
     // Control variables
     private bool hasStartedMoving = false;
     private bool updatePending = false;
-    private string pendingNewsText = "";
+    private List<string> pendingNewsText = new List<string>();
     private bool isScrollingActive = false;
+    private int currentNewsIndex = 0;
+    [SerializeField] private float newsCooldownTime = 10f;
+    private bool isCoolingDown = false;
     
     [SerializeField]
     private Color debugLineColor = Color.blue; // Debug line color
@@ -164,6 +167,71 @@ public class NewsGenerator : MonoBehaviour
         yield return null;
         yield return null;
         
+        // Main news display loop
+        while (true)
+        {
+            // Check if we need to update news from pending list
+            if (updatePending && pendingNewsText.Count > 0)
+            {
+                // Display one news item at a time
+                currentNewsIndex = 0;
+                StartCoroutine(DisplayNewsSequentially());
+                
+                // Reset state after starting the sequential display
+                updatePending = false;
+            }
+            
+            // Continue the standard scrolling for current visible text
+            if (!string.IsNullOrEmpty(newsTitleText.text))
+            {
+                yield return ScrollSingleNews(textRectTransform);
+            }
+            else
+            {
+                // If no text, just wait a frame
+                yield return null;
+            }
+        }
+    }
+    
+    private IEnumerator DisplayNewsSequentially()
+    {
+        // Process each news item in the list with cooldown between them
+        while (currentNewsIndex < pendingNewsText.Count)
+        {
+            // Show breaking news animation for the current item
+            StartCoroutine(ShowBreakingNews(breakingNewsContainer.transform));
+            
+            // Display the current news item
+            string currentNews = pendingNewsText[currentNewsIndex];
+            newsTitleText.text = currentNews;
+            newsTitleText.ForceMeshUpdate();
+            
+            // Notify listeners about the new news item
+            onNewsGenerated?.Invoke(currentNews);
+            
+            Debug.Log($"Displaying news {currentNewsIndex + 1}/{pendingNewsText.Count}: '{currentNews}'");
+            
+            // Move to the next item
+            currentNewsIndex++;
+            
+            // Wait for cooldown before showing the next news
+            if (currentNewsIndex < pendingNewsText.Count)
+            {
+                isCoolingDown = true;
+                Debug.Log($"Cooling down for {newsCooldownTime} seconds before next news");
+                yield return new WaitForSeconds(newsCooldownTime);
+                isCoolingDown = false;
+            }
+        }
+        
+        // When all news are displayed, clear the list
+        pendingNewsText.Clear();
+        currentNewsIndex = 0;
+    }
+    
+    private IEnumerator ScrollSingleNews(RectTransform textRectTransform)
+    {
         // Force Canvas and text to update
         Canvas.ForceUpdateCanvases();
         newsTitleText.ForceMeshUpdate();
@@ -202,9 +270,16 @@ public class NewsGenerator : MonoBehaviour
         hasStartedMoving = false;
         bool completedOneCycle = false;
         
-        // Now we can start scrolling
-        while (true)
+        // Scroll this single news headline until it completes one cycle
+        while (!completedOneCycle)
         {
+            // If we're cooling down between news, pause scrolling
+            if (isCoolingDown)
+            {
+                yield return null;
+                continue;
+            }
+            
             // Get current position
             position = textRectTransform.anchoredPosition;
             
@@ -228,50 +303,6 @@ public class NewsGenerator : MonoBehaviour
                 textRectTransform.anchoredPosition = position;
                 
                 completedOneCycle = true;
-                
-                // Check if there's a pending update after completing at least one cycle
-                if (updatePending && completedOneCycle)
-                {
-                    Debug.Log("Applying pending news update after cycle completion");
-                    StartCoroutine(ShowBreakingNews(breakingNewsContainer.transform));
-                    onNewsGenerated.Invoke(pendingNewsText);
-
-                    //if (panelManager.activePanel != 2)
-                    //{
-                    //    StartCoroutine(ShowBreakingNews(breakingNewsContainer.transform));
-                    //}
-
-                    // Update the text with the pending news
-                    newsTitleText.text = pendingNewsText;
-                    newsTitleText.ForceMeshUpdate();
-                    
-                    // Clear the pending state
-                    updatePending = false;
-                    pendingNewsText = "";
-                    
-                    // Get updated width and reset position
-                    textWidth = newsTitleText.preferredWidth;
-                    if (textWidth <= 0)
-                    {
-                        if (newsTitleText.text.Length > 0)
-                        {
-                            textWidth = newsTitleText.text.Length * 20f;
-                        }
-                        else
-                        {
-                            textWidth = 500f;
-                        }
-                    }
-                    
-                    // Start from the beginning with the new text
-                    position.x = startPositionX;
-                    textRectTransform.anchoredPosition = position;
-                    
-                    // Reset cycle completion flag to ensure at least one full cycle of the new text
-                    completedOneCycle = false;
-                    
-                    Debug.Log($"Updated news title text: '{newsTitleText.text}' with width: {textWidth}");
-                }
             }
             
             yield return null;
@@ -353,9 +384,10 @@ public class NewsGenerator : MonoBehaviour
     {
         if (newsTitleText != null)
         {
-            // Stop any current scrolling
+            // Stop any current scrolling and news display sequence
             StopAllCoroutines();
             isScrollingActive = false;
+            isCoolingDown = false;
             
             // Update the text immediately
             newsTitleText.text = newText;
@@ -363,7 +395,8 @@ public class NewsGenerator : MonoBehaviour
             
             // Clear any pending updates
             updatePending = false;
-            pendingNewsText = "";
+            pendingNewsText.Clear();
+            currentNewsIndex = 0;
             
             Debug.Log($"Forced news update: '{newText}'");
             
@@ -411,17 +444,17 @@ public class NewsGenerator : MonoBehaviour
                 if (newsTitleText != null)
                 {
                     // Queue the update instead of applying immediately
-                    pendingNewsText = newsHeadline;
+                    pendingNewsText.Add(newsHeadline);
                     generatedActions.Add(newsHeadline);
                     updatePending = true;
                     
-                    Debug.Log($"News update queued: '{newsHeadline}'. Will apply after current cycle completes.");
+                    Debug.Log($"News update queued: '{newsHeadline}'. Will be displayed in sequence.");
                     
                     // If no active scrolling and we have content, start it now
                     if (!isScrollingActive && !string.IsNullOrWhiteSpace(newsHeadline))
                     {
                         StartScrollingIfNeeded();
-                        onNewsGenerated.Invoke(newsHeadline);
+                        // The event will be invoked when the news is actually displayed
                     }
                 }
                 else
