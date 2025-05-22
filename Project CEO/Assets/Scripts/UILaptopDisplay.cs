@@ -17,11 +17,13 @@ public class UILaptopDisplay : MonoBehaviour
     private void OnEnable()
     {
         NewsGenerator.onNewsGenerated += LaptopOnNewsGenerated;
+        InputManager.OnEnterKeyDown += AddPlayerDialog;
     }
 
     private void OnDisable()
     {
         NewsGenerator.onNewsGenerated -= LaptopOnNewsGenerated;
+        InputManager.OnEnterKeyDown -= AddPlayerDialog;
     }
 
     private void Start()

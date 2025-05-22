@@ -48,7 +48,7 @@ public class NewsGenerator : MonoBehaviour
 
     private void OnEnable()
     {
-        UnityToGemini.GeminiResponseCallback += UnpackNewsResponse;
+       UnityToGemini.GeminiResponseCallback += UnpackNewsResponse;
         //PanelManager.switchPanel += OnSwitchPanel;
         CameraManager.onChangeCamera += OnChangeCamera;
     }
