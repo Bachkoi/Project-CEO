@@ -19,20 +19,20 @@ public class UILaptopDisplay : MonoBehaviour
     private void OnEnable()
     {
         NewsGenerator.onNewsGenerated += LaptopOnNewsGenerated;
-        InputManager.OnEnterKeyDown += AddPlayerDialog;
+        InputManager.OnEnterKeyDownLate += AddPlayerDialog;
     }
 
     private void OnDisable()
     {
         NewsGenerator.onNewsGenerated -= LaptopOnNewsGenerated;
-        InputManager.OnEnterKeyDown -= AddPlayerDialog;
+        InputManager.OnEnterKeyDownLate -= AddPlayerDialog;
     }
 
     private void Start()
     {
         // Register the button click listener
         sendButton.onClick.AddListener(AddPlayerDialog);
-        //LaptopUIInit();
+        LaptopUIInit();
     }
 
     private static readonly List<string> questionTemplates = new List<string>
@@ -52,7 +52,6 @@ public class UILaptopDisplay : MonoBehaviour
     public void LaptopUIInit()
     {
         ClearVisitor();
-        AddVisitor();
         ClearDialog();
     }
 
@@ -116,6 +115,9 @@ public class UILaptopDisplay : MonoBehaviour
         ClearDialog();
         ClearVisitor();
         sendButton.enabled = true;
+        inputField.ActivateInputField();
+        inputField.enabled = true;
+        GameplayManager.canPlayerSend = true;
         string question = GenerateRandomQuestion(news);
         AddVisitor();
         AddJournalistDialog(question);
@@ -123,6 +125,7 @@ public class UILaptopDisplay : MonoBehaviour
 
     private void AddPlayerDialog()
     {
+
         string message = inputField.text.Trim();
         if (string.IsNullOrEmpty(message)) 
             return;
@@ -139,6 +142,8 @@ public class UILaptopDisplay : MonoBehaviour
 
         //clear input field after sending
         inputField.text = "";
+        inputField.DeactivateInputField();
+        inputField.enabled = false;
 
         sendButton.enabled = false;
     }

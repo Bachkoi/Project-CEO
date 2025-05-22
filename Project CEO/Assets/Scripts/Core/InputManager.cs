@@ -6,6 +6,7 @@ using UnityEngine;
 public class InputManager : MonoBehaviour
 {
     public static Action OnEnterKeyDown = delegate { };
+    public static Action OnEnterKeyDownLate = delegate { };
 
     // Update is called once per frame
     void Update()
@@ -13,6 +14,7 @@ public class InputManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Return))
         {
             OnEnterKeyDown.Invoke();
+            OnEnterKeyDownLate.Invoke();
         }
     }
 }

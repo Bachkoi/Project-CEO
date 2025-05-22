@@ -23,6 +23,8 @@ public class GameplayManager : MonoBehaviour
     public static event Action<string> onPlayerRespond;
     public static event Action<string, int> onPublicReact;
 
+    public static bool canPlayerSend = false;
+
     private void OnEnable()
     {
         //Submit player input when hitting enter key
@@ -36,16 +38,22 @@ public class GameplayManager : MonoBehaviour
 
     public void OnSubmitButtonClicked()
     {
+        if (!canPlayerSend)
+        {
+            return;
+        }
         if (string.IsNullOrEmpty(playerInputField.text))
         {
             return;
         }
         string input = playerInputField.text;
         OnPlayerSubmitResponse(input);
+        canPlayerSend = false;
     }
 
     void Start()
     {
+        canPlayerSend = false;
         StockPriceDisplay.Instance.Initialize(UnityToGemini.Instance.companyAcronym, stockPriceStart);
         StartCoroutine(GameLoop());
     }
