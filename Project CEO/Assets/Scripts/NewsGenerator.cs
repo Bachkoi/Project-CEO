@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using System;
 using Sirenix.OdinInspector;
 using System.Linq;
+using Backend;
 
 public class NewsGenerator : MonoBehaviour
 {
@@ -374,37 +375,7 @@ public class NewsGenerator : MonoBehaviour
         }
     }
     
-    // News response class to deserialize JSON from Gemini API
-    [Serializable]
-    private class NewsResponse
-    {
-        [JsonProperty("candidates")]
-        public List<NewsCandidate> Candidates { get; set; }
-    }
-    
-    [Serializable]
-    private class NewsCandidate
-    {
-        [JsonProperty("content")]
-        public NewsContent Content { get; set; }
-    }
-    
-    [Serializable]
-    private class NewsContent
-    {
-        [JsonProperty("parts")]
-        public List<NewsPart> Parts { get; set; }
-        
-        [JsonProperty("role")]
-        public string Role { get; set; }
-    }
-    
-    [Serializable]
-    private class NewsPart
-    {
-        [JsonProperty("text")]
-        public string Text { get; set; }
-    }
+    // Using Backend.GeminiResponse for JSON deserialization
     
     /// <summary>
     /// Unpacks a Gemini API JSON response string and queues a news title update
@@ -418,20 +389,20 @@ public class NewsGenerator : MonoBehaviour
             return;
         try
         {
-            // Deserialize the JSON string to NewsResponse object
-            NewsResponse response = JsonConvert.DeserializeObject<NewsResponse>(rawResponse);
+            // Deserialize the JSON string to Backend.GeminiResponse object
+            Backend.GeminiResponse response = JsonConvert.DeserializeObject<Backend.GeminiResponse>(rawResponse);
             
             // Validate response structure and extract the text content
             if (response != null && 
                 response.Candidates != null && 
                 response.Candidates.Count > 0 && 
-                response.Candidates[0].Content != null &&
-                response.Candidates[0].Content.Parts != null &&
-                response.Candidates[0].Content.Parts.Count > 0 &&
-                !string.IsNullOrEmpty(response.Candidates[0].Content.Parts[0].Text))
+                response.Candidates[0].Contents != null &&
+                response.Candidates[0].Contents.Parts != null &&
+                response.Candidates[0].Contents.Parts.Count > 0 &&
+                !string.IsNullOrEmpty(response.Candidates[0].Contents.Parts[0].Text))
             {
                 // Extract the actual news headline text from the Gemini response
-                string newsHeadline = response.Candidates[0].Content.Parts[0].Text;
+                string newsHeadline = response.Candidates[0].Contents.Parts[0].Text;
                 
                 // Remove any JSON formatting or quotes that might be in the text
                 newsHeadline = CleanResponseText(newsHeadline);
