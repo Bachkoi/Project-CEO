@@ -241,10 +241,10 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 6232432759695810884}
   - {fileID: 8543824788489358674}
   - {fileID: 2532587278316701580}
   - {fileID: 4597562107104346599}
-  - {fileID: 6232432759695810884}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -308,6 +308,7 @@ MonoBehaviour:
   chartContainer: {fileID: 6232432759695810884}
   lineRenderer: {fileID: 3173350380845521802}
   maxDataPoints: 50
+  currentPrice: 0
 --- !u!1 &5318287358556502413
 GameObject:
   m_ObjectHideFlags: 0
@@ -625,7 +626,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e630c78e2600d5469700f891057d0cb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Material: {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}

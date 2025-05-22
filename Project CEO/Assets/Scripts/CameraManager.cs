@@ -6,8 +6,13 @@ using UnityEngine.UI;
 
 public class CameraManager : MonoBehaviour
 {
+    // Add these new fields at the top of the class
+    private bool isTransitioning = false;
+    private int targetCameraIndex = -1;
+    private Coroutine currentTransition = null;
+
     [SerializeField] private Camera[] cameras;
-    [SerializeField] private float transitionTime = 2.0f;
+    [SerializeField] private float transitionTime = 1.0f;
     private int currentCameraIndex = 0;
     public Camera currentCamera;
     public Canvas canvas;
@@ -105,6 +110,7 @@ public class CameraManager : MonoBehaviour
         onChangeCamera?.Invoke(currentCameraIndex);
     }
 
+    // Modify the SwitchToCamera method
     public void SwitchToCamera(int index)
     {
         if (index < 0 || index >= cameras.Length)
@@ -113,11 +119,67 @@ public class CameraManager : MonoBehaviour
             return;
         }
 
-        StartCoroutine(TransitionToCamera(index));
+        // If we're already transitioning to this camera, make it instant
+        if (isTransitioning && targetCameraIndex == index)
+        {
+            if (currentTransition != null)
+            {
+                StopCoroutine(currentTransition);
+            }
+            CompleteTransitionImmediately(index);
+            return;
+        }
+
+        targetCameraIndex = index;
+        currentTransition = StartCoroutine(TransitionToCamera(index));
     }
 
+    // Add this new method
+    private void CompleteTransitionImmediately(int newIndex)
+    {
+        int previousIndex = currentCameraIndex;
+        currentCameraIndex = newIndex;
+
+        Camera prevCamera = cameras[previousIndex];
+        Debug.Log("Prev Cam: " +prevCamera.name);
+        Camera nextCamera = cameras[currentCameraIndex];
+        Debug.Log("Next Cam: " + nextCamera.name);
+
+        // Immediately disable the previous camera
+        if (prevCamera != null)
+        {
+            prevCamera.gameObject.SetActive(false);
+            // Reset the previous camera immediately
+            CameraReset(prevCamera, previousIndex);
+        }
+
+        // Enable and setup new camera
+        if (nextCamera != null)
+        {
+            nextCamera.gameObject.SetActive(true);
+            nextCamera.depth = prevCamera.depth;
+            // Make sure the new camera is at its intended position, rotation, and FOV
+            nextCamera.transform.position = defaultPositions[newIndex];
+            nextCamera.fieldOfView = defaultFOVs[newIndex];
+            currentCamera = nextCamera;
+            canvas.worldCamera = currentCamera;
+        }
+
+        // Update UI
+        EnableButtons(currentCameraIndex);
+        onChangeCamera?.Invoke(currentCameraIndex);
+
+        // Reset transition state
+        isTransitioning = false;
+        targetCameraIndex = -1;
+        currentTransition = null;
+    }
+
+    // Modify the TransitionToCamera method
     private IEnumerator TransitionToCamera(int newIndex)
     {
+        isTransitioning = true;
+
         int previousIndex = currentCameraIndex;
         currentCameraIndex = newIndex;
 
@@ -165,9 +227,15 @@ public class CameraManager : MonoBehaviour
             currentCamera = nextCamera;
             canvas.worldCamera = currentCamera;
         }
+
         CameraReset(cameras[previousIndex], previousIndex);
         EnableButtons(currentCameraIndex);
         onChangeCamera?.Invoke(currentCameraIndex);
+
+        // Reset transition state
+        isTransitioning = false;
+        targetCameraIndex = -1;
+        currentTransition = null;
     }
 
     public void CameraReset(Camera pCam, int pIndex)
