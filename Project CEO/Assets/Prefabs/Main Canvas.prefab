@@ -2895,7 +2895,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 1
+  m_PresetInfoIsWorld: 0
 --- !u!114 &5484436458181020363
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3880,7 +3880,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2192820431716604201, guid: 45f70a219dd18114f8c09d3b339ac984, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0.000045776367
+      value: -0.014251709
       objectReference: {fileID: 0}
     - target: {fileID: 5872734245399027472, guid: 45f70a219dd18114f8c09d3b339ac984, type: 3}
       propertyPath: m_AnchorMax.x
@@ -4044,7 +4044,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8887842318413503034, guid: 45f70a219dd18114f8c09d3b339ac984, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0.000045776367
+      value: -0.011833152
       objectReference: {fileID: 0}
     - target: {fileID: 9184751285232012529, guid: 45f70a219dd18114f8c09d3b339ac984, type: 3}
       propertyPath: m_Name
@@ -4445,6 +4445,22 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 6311034091180180979}
     m_Modifications:
+    - target: {fileID: 2205622852226182830, guid: 12b04a120ff9e0b4dafc93812318c2f2, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2877466349415116144, guid: 12b04a120ff9e0b4dafc93812318c2f2, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2877466349415116144, guid: 12b04a120ff9e0b4dafc93812318c2f2, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3701005529089348968, guid: 12b04a120ff9e0b4dafc93812318c2f2, type: 3}
+      propertyPath: m_PresetInfoIsWorld
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4167576552441354681, guid: 12b04a120ff9e0b4dafc93812318c2f2, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -4507,11 +4523,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4167576552441354681, guid: 12b04a120ff9e0b4dafc93812318c2f2, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 681
+      value: 443.6
       objectReference: {fileID: 0}
     - target: {fileID: 4167576552441354681, guid: 12b04a120ff9e0b4dafc93812318c2f2, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 383
+      value: 493.3
       objectReference: {fileID: 0}
     - target: {fileID: 4167576552441354681, guid: 12b04a120ff9e0b4dafc93812318c2f2, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -4528,6 +4544,14 @@ PrefabInstance:
     - target: {fileID: 5586309487736137074, guid: 12b04a120ff9e0b4dafc93812318c2f2, type: 3}
       propertyPath: m_Name
       value: News Canvas
+      objectReference: {fileID: 0}
+    - target: {fileID: 8249199371868130324, guid: 12b04a120ff9e0b4dafc93812318c2f2, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -0.000061035156
+      objectReference: {fileID: 0}
+    - target: {fileID: 8249199371868130324, guid: 12b04a120ff9e0b4dafc93812318c2f2, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0.000030517578
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

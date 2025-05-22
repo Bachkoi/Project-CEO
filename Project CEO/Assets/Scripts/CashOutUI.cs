@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 /// <summary>
 /// Manages the UI elements related to the cash-out feature that appears periodically in the game.
@@ -18,14 +19,17 @@ public class CashOutUI : MonoBehaviour
     /// This container is shown/hidden based on the game's day cycle.
     /// </summary>
     [SerializeField] protected GameObject cashOutContainer;
-
+    [SerializeField] protected Button cashOutBtn;
+    [SerializeField] protected Button continueBtn;
+    
     /// <summary>
     /// Called when the script instance is being enabled.
     /// Subscribes to the TimeManager's day change event to receive notifications when the day changes.
     /// </summary>
     private void OnEnable()
     {
-        TimeManager.onDayChange += OnDayChange;
+        TimeManager.onWeekChange += OnWeekChange;
+        continueBtn.onClick.AddListener(ContinuePlaying);
     }
 
     /// <summary>
@@ -34,7 +38,8 @@ public class CashOutUI : MonoBehaviour
     /// </summary>
     private void OnDisable()
     {
-        TimeManager.onDayChange -= OnDayChange;
+        TimeManager.onWeekChange -= OnWeekChange;
+        continueBtn.onClick.RemoveListener(ContinuePlaying);
     }
 
     /// <summary>
@@ -48,11 +53,13 @@ public class CashOutUI : MonoBehaviour
     /// - The current day minus 1, modulo 5 equals 0
     /// This creates a pattern where the UI appears on days 5, 10, 15, etc.
     /// </remarks>
-    private void OnDayChange(int day)
+    private void OnWeekChange(int day)
     {
-        if (day != 0 && (day - 1) % 5 == 0)
-        {
-            cashOutContainer.SetActive(true);
-        }
+        cashOutContainer.SetActive(true);
+    }
+
+    public void ContinuePlaying()
+    {
+        TimeManager.Instance.EndDayAnimation();
     }
 }

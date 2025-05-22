@@ -1035,6 +1035,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cashOutContainer: {fileID: 3134719371349746664}
+  cashOutBtn: {fileID: 3646497049825233376}
+  continueBtn: {fileID: 4350698373090582873}
 --- !u!1001 &1770421631704215751
 PrefabInstance:
   m_ObjectHideFlags: 0

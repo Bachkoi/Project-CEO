@@ -5,6 +5,7 @@ using UnityEngine;
 using System;
 using System.Text;
 using TMPro;
+using UnityEngine.UI;
 
 public class TimeManager : SerializedMonoBehaviour
 {
@@ -13,7 +14,9 @@ public class TimeManager : SerializedMonoBehaviour
 
     [SerializeField] private GameObject timePopupContainer;
     [SerializeField] private TextMeshProUGUI timePopupText;
-    
+
+    [SerializeField] private Image daySwitchImage;
+    [SerializeField] private Button dayEndBtn;
     
     //getters & setters
     public int CurrentDay
@@ -28,7 +31,17 @@ public class TimeManager : SerializedMonoBehaviour
     /// Static instance of the TimeManager that can be accessed from anywhere.
     /// </summary>
     public static TimeManager Instance { get; private set; }
-    
+
+    private void OnEnable()
+    {
+        dayEndBtn.onClick.AddListener(EndDay);
+    }
+
+    private void OnDisable()
+    {
+        dayEndBtn.onClick.RemoveListener(EndDay);
+    }
+
     /// <summary>
     /// Awake is called when the script instance is being loaded.
     /// Used to initialize the singleton instance.
@@ -46,6 +59,9 @@ public class TimeManager : SerializedMonoBehaviour
             // If an instance already exists, destroy this duplicate
             Destroy(gameObject);
         }
+        
+        if (days.Count <= 0)
+            days.Add((1, new List<string>()));
     }
 
     /// <summary>
@@ -67,32 +83,39 @@ public class TimeManager : SerializedMonoBehaviour
     /// </remarks>
     public void OnPlayerRespond(string response)
     {
-        // If no days exist yet, initialize the first day
+        // // If no days exist yet, initialize the first day
+        // if (days.Count <= 0)
+        // {
+        //     days.Add((CurrentDay, new List<string>()));
+        // }
+        //
+        // // If the current day has reached the maximum responses (3), 
+        // // advance to the next day and add the response there
+        // if (days[CurrentDay].Item2.Count >= 3)
+        // {
+        //     days.Add((CurrentDay+1, new List<string>(){response}));
+        //     onDayChange?.Invoke(CurrentDay+1);
+        //     UpdateTimeText();
+        //     timePopupContainer.SetActive(true);
+        //     
+        //     if (days.Count != 0 && days.Count % 5 == 0)
+        //     {
+        //         currentWeek++;
+        //         onWeekChange?.Invoke(currentWeek);
+        //     }
+        // }
+        // else
+        // {
+        //     // Otherwise, add the response to the current day's list
+        //     days[CurrentDay].Item2.Add(response);
+        // }
+        
         if (days.Count <= 0)
         {
             days.Add((CurrentDay, new List<string>()));
         }
-    
-        // If the current day has reached the maximum responses (3), 
-        // advance to the next day and add the response there
-        if (days[CurrentDay].Item2.Count >= 3)
-        {
-            days.Add((CurrentDay+1, new List<string>(){response}));
-            onDayChange?.Invoke(CurrentDay+1);
-            UpdateTimeText();
-            timePopupContainer.SetActive(true);
-            
-            if (days.Count != 0 && days.Count % 5 == 0)
-            {
-                currentWeek++;
-                onWeekChange?.Invoke(currentWeek);
-            }
-        }
-        else
-        {
-            // Otherwise, add the response to the current day's list
-            days[CurrentDay].Item2.Add(response);
-        }
+        days[CurrentDay].Item2.Add(response);
+        
     }
 
     public void UpdateTimeText()
@@ -100,7 +123,7 @@ public class TimeManager : SerializedMonoBehaviour
         StringBuilder builder = new StringBuilder();
         builder.Append("Today is week ");
         builder.Append(currentWeek + 1);
-        switch (CurrentDay % 5)
+        switch (days.Count % 5)
         {
             case 1:
                 builder.Append(" Monday");
@@ -119,16 +142,63 @@ public class TimeManager : SerializedMonoBehaviour
                 break;
         }
 
-        if (CurrentDay % 5 > 0)
+        if (days.Count % 5 > 0)
         {
-            builder.Append(", \nyou still need to keep the company running for ");
-            builder.Append(CurrentDay % 5);
+            builder.Append(".\n ");
+            builder.Append("you still need to keep the company running for ");
+            builder.Append(6 - (days.Count % 5));
             builder.Append(" days. ");
         }
         else
         {
-            builder.Append("You can cash out at the end of the day!");
+            builder.Append(".\nYou can cash out at the end of the day!");
         }
         timePopupText.text = builder.ToString();
+    }
+
+    public void EndDay()
+    {
+        if (days.Count != 0 && (days.Count % 5) == 0)
+        {
+            currentWeek++;
+            onWeekChange?.Invoke(currentWeek);
+        }
+        else
+        {
+            EndDayAnimation();
+        }
+        days.Add((CurrentDay+1, new List<string>()));
+    }
+
+    public void EndDayAnimation()
+    {
+        StartCoroutine(SwitchDayAnimationCo());
+        onDayChange?.Invoke(CurrentDay);
+    }
+
+    IEnumerator SwitchDayAnimationCo()
+    {
+        float t = 0.0f;
+        daySwitchImage.gameObject.SetActive(true);
+        daySwitchImage.color = Color.clear;
+        while (t < 1f)
+        {
+            t+=Time.deltaTime;
+            daySwitchImage.color = Color.Lerp(Color.clear, Color.black, t);
+            yield return null;
+        }
+        
+        UpdateTimeText();
+        timePopupContainer.SetActive(true);
+        yield return new WaitForSeconds(2f);
+
+        t = 0.0f;
+        while (t < 1f)
+        {
+            t+=Time.deltaTime;
+            daySwitchImage.color = Color.Lerp(Color.black, Color.clear, t);
+            yield return null;
+        }
+        daySwitchImage.gameObject.SetActive(false);
     }
 }

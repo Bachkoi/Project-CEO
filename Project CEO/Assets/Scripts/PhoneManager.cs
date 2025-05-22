@@ -54,7 +54,7 @@ public class PhoneManager : MonoBehaviour
         while (t < duration)
         {
             t += Time.deltaTime;
-            emojiImage.transform.localScale = Vector3.Lerp(Vector3.one, emojiImage.transform.localScale, t/duration);
+            emojiImage.transform.localScale = Vector3.Lerp(Vector3.one, Vector3.zero, t/duration);
             yield return null;
         }
         emojiImage.gameObject.SetActive(false);
