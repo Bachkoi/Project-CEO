@@ -114,7 +114,7 @@ public class TimeManager : SerializedMonoBehaviour
         {
             days.Add((CurrentDay, new List<string>()));
         }
-        days[CurrentDay].Item2.Add(response);
+        days[CurrentDay-1].Item2.Add(response);
         
     }
 

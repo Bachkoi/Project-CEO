@@ -10,6 +10,7 @@ public class MenuManager : MonoBehaviour
     [SerializeField] protected TMP_InputField apiKeyField;
     [SerializeField] protected TMP_InputField companyNameField;
     [SerializeField] protected TMP_InputField companyDescriptionField;
+    [SerializeField] protected TMP_InputField companyAcronymField;
     [SerializeField] protected Button verifyBtn;
     [SerializeField] protected Button startBtn;
     [SerializeField] protected TextMeshProUGUI statusText;
@@ -79,12 +80,20 @@ public class MenuManager : MonoBehaviour
             return;
         }
         
+        // Validate company acronym
+        if (companyAcronymField == null || string.IsNullOrWhiteSpace(companyAcronymField.text) || companyAcronymField.text.Trim().Length > 4)
+        {
+            UpdateStatusText("Please enter a company acronym, no longer than 4 characters.");
+            return;
+        }
+        
         // Disable UI while validating
         isValidating = true;
         verifyBtn.interactable = false;
         apiKeyField.interactable = false;
         companyNameField.interactable = false;
         companyDescriptionField.interactable = false;
+        companyAcronymField.interactable = false;
         UpdateStatusText("Validating API key...");
         
         // Send validation request
@@ -117,6 +126,9 @@ public class MenuManager : MonoBehaviour
             if (companyDescriptionField != null)
                 companyDescriptionField.interactable = true;
             
+            if (companyAcronymField != null)
+                companyAcronymField.interactable = true;
+            
             if (verifyBtn != null && !string.IsNullOrWhiteSpace(apiKeyField.text))
                 verifyBtn.interactable = true;
                 
@@ -136,8 +148,9 @@ public class MenuManager : MonoBehaviour
             // Store company information in UnityToGemini
             UnityToGemini.Instance.companyName = companyNameField.text.Trim();
             UnityToGemini.Instance.companyDescription = companyDescriptionField.text.Trim();
-            
-            Debug.Log($"Company info saved - Name: {UnityToGemini.Instance.companyName}, Description: {UnityToGemini.Instance.companyDescription}");
+            UnityToGemini.Instance.companyAcronym = companyAcronymField.text.Trim();
+
+            Debug.Log($"Company info saved - Name: {UnityToGemini.Instance.companyName}, Description: {UnityToGemini.Instance.companyDescription}, Acronym {UnityToGemini.Instance.companyAcronym}");
             
             // Enable the start button
             if (startBtn != null)

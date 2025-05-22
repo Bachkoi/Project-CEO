@@ -22,16 +22,39 @@ public class GameplayManager : MonoBehaviour
 
     public static event Action<string> onPlayerRespond;
     public static event Action<string, int> onPublicReact;
-    
+
+    public static bool canPlayerSend = false;
+
+    private void OnEnable()
+    {
+        //Submit player input when hitting enter key
+        InputManager.OnEnterKeyDown += OnSubmitButtonClicked;
+    }
+
+    private void OnDisable()
+    {
+        InputManager.OnEnterKeyDown -= OnSubmitButtonClicked;
+    }
+
     public void OnSubmitButtonClicked()
     {
+        if (!canPlayerSend)
+        {
+            return;
+        }
+        if (string.IsNullOrEmpty(playerInputField.text))
+        {
+            return;
+        }
         string input = playerInputField.text;
         OnPlayerSubmitResponse(input);
+        canPlayerSend = false;
     }
 
     void Start()
     {
-        StockPriceDisplay.Instance.Initialize("LLMG", stockPriceStart);
+        canPlayerSend = false;
+        StockPriceDisplay.Instance.Initialize(UnityToGemini.Instance.companyAcronym, stockPriceStart);
         StartCoroutine(GameLoop());
     }
 
@@ -133,7 +156,8 @@ public class GameplayManager : MonoBehaviour
         //string prompt = $"I’m talking to another AI acting as the public/reacting to a CEO’s response. The company recently took this action: {companyAction}. The CEO responded to media/questions with: {playerResponse}. Evaluate the CEO’s response based on: Crisis Management (Did it address the issue effectively?), Tone/PR Skill (Was it confident, empathetic, or tone-deaf?), Public Perception (How will typical stakeholders react?).\nYou will score their response on a score from -2 to 2 (INTEGER ONLY), where: -2 is backlash, -1 is Poor response, 0 is Neutral/no impact, 1 is Good save, 2 is Great save and a SHORT public reaction (e.g., headlines, social media buzz). Please return it as a json with the following output: {{\"saveQuality\": YourScoreHere, \"publicReaction\": \"Your prediction here\"}}\n";
         //string prompt = $"I’m talking to another AI in a humorous game reacting to a CEO’s response. The company recently took this action: {{CompanyAction}}. The CEO responded to media/questions with: {{PlayerResponse}}. Evaluate the CEO’s response based on: whether or not you believe that the CEO handled it effectively. You will score their response on a score from -2 to 2 (INTEGER ONLY), where: -2 is backlash, -1 is Poor response, 0 is Neutral/no impact, 1 is Good save, 2 is Great save and a SHORT public reaction (e.g., headlines, social media buzz). Please return it as a json with the following output: {{\"saveQuality\": YourScoreHere, \"publicReaction\": \"Your prediction here\"}}";
         //string prompt = $"I’m talking to another AI in a humorous game reacting to a CEO’s response. The company recently took this action: {companyAction}. The CEO responded to media/questions with: {playerResponse}. Evaluate the CEO’s response based on: whether or not you believe that the CEO handled it effectively. You will score their response on a score from -2 to 2 (INTEGER ONLY), where: -2 is backlash, -1 is Poor response, 0 is Neutral/no impact, 1 is Good save, 2 is Great save and a SHORT public reaction (e.g., headlines, social media buzz). Please return it in a STRICT JSON with the following output: {{\"saveQuality\": YourScoreHere, \"publicReaction\": \"Your prediction here\"}}";
-        string prompt = $"I’m talking to another AI in a humorous game reacting to a CEO’s response. The company recently took this action: {companyAction}. The CEO responded to media/questions with: {playerResponse}. Evaluate the CEO’s response based on: whether or not you believe that the CEO handled it effectively, but do NOT take it too seriously, as the game is supposed to be funny and lighthearted. You will score their response on a score from -2 to 2 (INTEGER ONLY), where: -2 is backlash, -1 is Poor response, 0 is Neutral/no impact, 1 is Good save, 2 is Great save and a SHORT public reaction (e.g., headlines, social media buzz). Please return it in a STRICT JSON with the following output: {{\"saveQuality\": YourScoreHere, \"publicReaction\": \"Your prediction here\"}}";
+        //string prompt = $"I’m talking to another AI in a humorous game reacting to a CEO’s response. The company recently took this action: {companyAction}. The CEO responded to media/questions with: {playerResponse}. Evaluate the CEO’s response based on: whether or not you believe that the CEO handled it effectively, but do NOT take it too seriously, as the game is supposed to be funny and lighthearted. You will score their response on a score from -2 to 2 (INTEGER ONLY), where: -2 is backlash, -1 is Poor response, 0 is Neutral/no impact, 1 is Good save, 2 is Great save and a SHORT public reaction (e.g., headlines, social media buzz). Please return it in a STRICT JSON with the following output: {{\"saveQuality\": YourScoreHere, \"publicReaction\": \"Your prediction here\"}}";
+        string prompt = $"I’m talking to another AI in a humorous game reacting to a CEO’s response. The company recently took this action: {companyAction}. The CEO responded to media/questions with: {playerResponse}. Evaluate the CEO’s response based on: whether or not you believe that the CEO handled it effectively, but do NOT take it too seriously, as the game is supposed to be funny and lighthearted. You will rate their response on a score from -2 to 2 (INTEGER ONLY), where: -2 is backlash, -1 is Poor response, 0 is Neutral/no impact, 1 is Good save, 2 is Great save and a SHORT public reaction (e.g., headlines, social media buzz). Please return it in a STRICT JSON with the following output: {{\"responseQuality\": YourScoreHere, \"publicReaction\": \"Your prediction here\"}}";
         bool isResponseReceived = false;
 
         UnityToGemini.GeminiResponseCallback += OnPublicReaction;
