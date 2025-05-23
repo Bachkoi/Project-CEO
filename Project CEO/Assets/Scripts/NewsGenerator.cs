@@ -56,6 +56,7 @@ public class NewsGenerator : MonoBehaviour
         //PanelManager.switchPanel += OnSwitchPanel;
         CameraManager.onChangeCamera += OnChangeCamera;
         GameplayManager.onPublicReact += OnPublicReact;
+        TimeManager.onDayChange += OnDayChange;
     }
     
     private void OnDisable()
@@ -64,6 +65,26 @@ public class NewsGenerator : MonoBehaviour
         //PanelManager.switchPanel -= OnSwitchPanel;
         CameraManager.onChangeCamera -= OnChangeCamera;
         GameplayManager.onPublicReact -= OnPublicReact;
+        TimeManager.onDayChange -= OnDayChange;
+    }
+    
+    /// <summary>
+    /// Handles day change events to generate initial news for the new day
+    /// </summary>
+    /// <param name="day">The new day number</param>
+    private void OnDayChange(int day)
+    {
+        GenerateInitialDailyNews();
+    }
+    
+    /// <summary>
+    /// Generates initial daily news when a new day starts
+    /// </summary>
+    private void GenerateInitialDailyNews()
+    {
+        Debug.Log("Generating initial news for new day");
+        UpdatePrompt();
+        UnityToGemini.Instance.SendRequest(updatedNewsPrompt, GeminiRequestType.News);
     }
 
     void Start()
@@ -314,8 +335,6 @@ public class NewsGenerator : MonoBehaviour
         position.x = startPositionX;
         textRectTransform.anchoredPosition = position;
         
-        Debug.Log($"Starting scroll. Text width: {textWidth}, Position: {position.x}, Reset at: {resetPositionX}");
-        
         // Wait another frame before starting the loop
         yield return null;
         
@@ -340,7 +359,6 @@ public class NewsGenerator : MonoBehaviour
             
             if (!hasStartedMoving)
             {
-                Debug.Log($"Initial position - X: {position.x}, Right Edge: {rightEdgePosition}");
                 hasStartedMoving = true;
             }
             

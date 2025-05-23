@@ -191,6 +191,9 @@ public class TimeManager : SerializedMonoBehaviour
         
         // Reset the news counter for the new day
         ResetNewsCounter();
+        
+        // Log that a new day has started for debugging
+        Debug.Log($"New day started: Day {CurrentDay}. News counter reset.");
     }
 
     public void EndDayAnimation()
@@ -238,10 +241,20 @@ public class TimeManager : SerializedMonoBehaviour
     /// <summary>
     /// Increments the news counter when a new news item is generated
     /// </summary>
-    public void IncrementNewsCounter()
+    /// <returns>True if the counter was incremented, false if the limit was reached</returns>
+    public bool IncrementNewsCounter()
     {
-        dailyNewsCount++;
-        Debug.Log($"News counter incremented: {dailyNewsCount}/{maxNewsPerDay}");
+        if (dailyNewsCount < maxNewsPerDay)
+        {
+            dailyNewsCount++;
+            Debug.Log($"News counter incremented: {dailyNewsCount}/{maxNewsPerDay} for day {CurrentDay}");
+            return true;
+        }
+        else
+        {
+            Debug.LogWarning($"Cannot increment news counter: daily limit reached ({dailyNewsCount}/{maxNewsPerDay})");
+            return false;
+        }
     }
     
     /// <summary>
