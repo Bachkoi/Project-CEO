@@ -4,6 +4,8 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Analytics;
 using System;
+using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 class Visitor
 {
@@ -97,6 +99,7 @@ public class GameplayManager : MonoBehaviour
     {
         canPlayerSend = false;
         StockPriceDisplay.Instance.Initialize(UnityToGemini.Instance.companyAcronym, stockPriceStart);
+        StockPriceDisplay.Instance.UpdatePrice(stockPriceStart+Random.Range(-0.001f, 0.001f));
         StartCoroutine(GameLoop());
     }
 
@@ -163,26 +166,84 @@ public class GameplayManager : MonoBehaviour
     {
         // Construct the prompt with the current stock price
         //string prompt = $"As the board of a public company, decide your next action. Current stock price: {StockPriceDisplay.Instance.CurrentPrice:F2}.";
-        newsGenerator.UpdatePrompt();
-        string prompt = newsGenerator.UpdatedNewsPrompt;
-        bool isResponseReceived = false;
-
-        // Create a local handler function to process the API response
-        UnityToGemini.GeminiResponseCallback += OnCompanyAction;
-        UnityToGemini.Instance.SendRequest(prompt, GeminiRequestType.News);
-
-        // Local function that processes the AI response
-        void OnCompanyAction(string responseJson, GeminiRequestType type)
+        if (!UnityToGemini.Instance.hasGlobalEvent)
         {
-            var res = UnityToGemini.Instance.UnpackGeminiResponse(responseJson);
-            lastCompanyAction = res.Candidates[0].Contents.Parts[0].Text;
-            Debug.Log("Company action: " + lastCompanyAction);
-            isResponseReceived = true;
-            UnityToGemini.GeminiResponseCallback -= OnCompanyAction;
+            float rng = Random.Range(0.0f, 1.0f);
+            if (rng > (1.0f - TimeManager.Instance.DailyNewsCount/4.0f))
+            {
+
+                bool isResponseReceived = false;
+                UnityToGemini.Instance.hasGlobalEvent = true;
+                // Create a local handler function to process the API response
+                UnityToGemini.GeminiResponseCallback += OnCompanyAction;
+                UnityToGemini.Instance.GenerateGlobalEvent();
+                newsGenerator.updatePending = true;
+
+
+
+                // Local function that processes the AI response
+                void OnCompanyAction(string responseJson, GeminiRequestType type)
+                {
+                    var res = UnityToGemini.Instance.UnpackGeminiResponse(responseJson);
+                    lastCompanyAction = res.Candidates[0].Contents.Parts[0].Text;
+                    lastCompanyAction = UnityToGemini.Instance.CleanText(lastCompanyAction);
+                    Debug.Log("Company action: " + lastCompanyAction);
+                    newsGenerator.pendingNewsText.Add(lastCompanyAction);
+                    isResponseReceived = true;
+                    UnityToGemini.GeminiResponseCallback -= OnCompanyAction;
+                }
+
+                // Pause the coroutine until we get a response
+                yield return new WaitUntil(() => isResponseReceived);
+            }
+            else
+            {
+                newsGenerator.UpdatePrompt();
+                string prompt = newsGenerator.UpdatedNewsPrompt;
+                bool isResponseReceived = false;
+
+                // Create a local handler function to process the API response
+                UnityToGemini.GeminiResponseCallback += OnCompanyAction;
+                UnityToGemini.Instance.SendRequest(prompt, GeminiRequestType.News);
+
+                // Local function that processes the AI response
+                void OnCompanyAction(string responseJson, GeminiRequestType type)
+                {
+                    var res = UnityToGemini.Instance.UnpackGeminiResponse(responseJson);
+                    lastCompanyAction = res.Candidates[0].Contents.Parts[0].Text;
+                    Debug.Log("Company action: " + lastCompanyAction);
+                    isResponseReceived = true;
+                    UnityToGemini.GeminiResponseCallback -= OnCompanyAction;
+                }
+
+                // Pause the coroutine until we get a response
+                yield return new WaitUntil(() => isResponseReceived);
+            }
+        }
+        else
+        {
+            newsGenerator.UpdatePrompt();
+            string prompt = newsGenerator.UpdatedNewsPrompt;
+            bool isResponseReceived = false;
+
+            // Create a local handler function to process the API response
+            UnityToGemini.GeminiResponseCallback += OnCompanyAction;
+            UnityToGemini.Instance.SendRequest(prompt, GeminiRequestType.News);
+
+            // Local function that processes the AI response
+            void OnCompanyAction(string responseJson, GeminiRequestType type)
+            {
+                var res = UnityToGemini.Instance.UnpackGeminiResponse(responseJson);
+                lastCompanyAction = res.Candidates[0].Contents.Parts[0].Text;
+                Debug.Log("Company action: " + lastCompanyAction);
+                isResponseReceived = true;
+                UnityToGemini.GeminiResponseCallback -= OnCompanyAction;
+            }
+
+            // Pause the coroutine until we get a response
+            yield return new WaitUntil(() => isResponseReceived);
         }
 
-        // Pause the coroutine until we get a response
-        yield return new WaitUntil(() => isResponseReceived);
     }
 
     IEnumerator EvaluatePublicReaction(string companyAction, string playerResponse)
@@ -232,6 +293,15 @@ public class GameplayManager : MonoBehaviour
             }
             float newPrice = Mathf.Max(0.01f, StockPriceDisplay.Instance.CurrentPrice + delta);
             StockPriceDisplay.Instance.UpdatePrice(newPrice);
+
+            if (newPrice < stockThreshold)
+            {
+                UnityToGemini.Instance.GoToEndState();
+            }
+            else
+            {
+                UnityToGemini.Instance.DetermineStress();
+            }
 
             isResponseReceived = true;
             UnityToGemini.GeminiResponseCallback -= OnPublicReaction;

@@ -57,11 +57,22 @@ MonoBehaviour:
   companyName: 
   companyDescription: 
   companyAcronym: 
+  gameplayManager: {fileID: 0}
   cm: {fileID: 0}
   globalEvents: []
   finalScoreText: 
   finalScoreTMP: {fileID: 0}
   UILRTEst: {fileID: 0}
+  headshotImage: {fileID: 0}
+  headshots:
+  - {fileID: 21300000, guid: d87cc75f4a323a14caa0d715b98c64b0, type: 3}
+  - {fileID: 21300000, guid: fd50689f7f3e66542a9c18bf9082ed74, type: 3}
+  - {fileID: 21300000, guid: 1e35fe2f832467c4eb3237f6af067c68, type: 3}
+  - {fileID: 21300000, guid: 6beb4a69f6764de409abb44bb531fe85, type: 3}
+  - {fileID: 21300000, guid: 637c81e44797b0348883e83cb6a2adb4, type: 3}
+  hasGlobalEvent: 0
+  timeManager: {fileID: 0}
+  isGoodEnding: 0
   OGPrompt: 
 --- !u!114 &912055053305110041
 MonoBehaviour:

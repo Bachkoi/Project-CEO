@@ -25,8 +25,8 @@ public class NewsGenerator : MonoBehaviour
     
     // Control variables
     private bool hasStartedMoving = false;
-    private bool updatePending = false;
-    private List<string> pendingNewsText = new List<string>();
+    public bool updatePending = false;
+    public List<string> pendingNewsText = new List<string>();
     private bool isScrollingActive = false;
     private int currentNewsIndex = 0;
     [SerializeField] private float newsCooldownTime = 10f;

@@ -14,7 +14,7 @@ public class StockPriceDisplay : MonoBehaviour
     [SerializeField] private UILineRenderer lineRenderer;
     
     [SerializeField] private int maxDataPoints = 50;
-    private List<StockPricePoint> priceHistory = new List<StockPricePoint>();
+    [SerializeField] private List<StockPricePoint> priceHistory = new List<StockPricePoint>();
 
     private static StockPriceDisplay _instance;
 
@@ -41,7 +41,9 @@ public class StockPriceDisplay : MonoBehaviour
         // Initialize the chart
         stockSymbol = UnityToGemini.Instance.companyAcronym;
         stockSymbolText.text = UnityToGemini.Instance.companyAcronym;
-        UpdatePrice(currentPrice);
+        //currentPrice += Random.Range(-0.01f, 0.01f);
+        //Debug.Log("SPDISPLAY UPDATE PRICE: " + currentPrice);
+        //UpdatePrice(currentPrice);
     }
 
     public void Initialize(string symbol, float initialPrice)
@@ -50,6 +52,14 @@ public class StockPriceDisplay : MonoBehaviour
         currentPrice = initialPrice;
         priceHistory.Clear();
         AddPricePoint(initialPrice);
+        UpdateDisplay();
+        currentPrice += Random.Range(-0.01f, 0.01f);
+        Debug.Log("SPDISPLAY UPDATE PRICE: " + currentPrice);
+        UpdatePrice(currentPrice);
+        currentPrice += Random.Range(-0.01f, 0.01f);
+        Debug.Log("SPDISPLAY UPDATE PRICE: " + currentPrice);
+        UpdatePrice(currentPrice);
+        UpdateChart();
         UpdateDisplay();
     }
 

@@ -9,6 +9,9 @@ using System.Text;
 using Backend;
 using Sirenix.OdinInspector;
 using TMPro;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using Random = UnityEngine.Random;
 
 public enum GeminiRequestType {News, Trend, PublicReaction, Interview,GlobalEvent, None}
@@ -36,6 +39,8 @@ public class UnityToGemini : MonoBehaviour
     public string companyDescription;
     public string companyAcronym;
 
+    public GameplayManager gameplayManager;
+    
     public CameraManager cm;
 
     public List<string> globalEvents;
@@ -45,6 +50,15 @@ public class UnityToGemini : MonoBehaviour
     public TextMeshProUGUI finalScoreTMP;
     
     public UILineRendererTest UILRTEst;
+
+    public Image headshotImage;
+
+    public Sprite[] headshots;
+
+    public bool hasGlobalEvent;
+    
+    public TimeManager timeManager;
+    public bool isGoodEnding;
 
 
     public string OGPrompt;
@@ -72,6 +86,18 @@ public class UnityToGemini : MonoBehaviour
             Instance.companyAcronym ??= companyAcronym;
             Instance.UILRTEst ??= UILRTEst;
             Instance.OGPrompt ??= OGPrompt;
+            Instance.finalScoreTMP ??= finalScoreTMP;
+            Instance.GetComponent<ScoreManager>().timeManager ??= timeManager;
+            Instance.headshotImage ??= headshotImage;
+            if (Instance.headshots.Length != headshots.Length)
+            {
+                for(int i = 0; i < headshots.Length; i++){
+                    Instance.headshots[i] = headshots[i];
+                }
+                //Instance.headshots.AddRange(headshots)
+            }
+            //Instance.headshots ??= headshots;
+            Instance.gameplayManager ??= gameplayManager;
             Instance.cm ??= cm;
             Instance.UILRTEst ??= UILRTEst;
             Destroy(gameObject);
@@ -88,36 +114,22 @@ public class UnityToGemini : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        //raycastDetector = GetComponent<RaycastDetector>();
-        //
-        //// Subscribe to events
-        //raycastDetector.onObjectClicked.AddListener(HandleObjectClicked);
-        //raycastDetector.onObjectHovered.AddListener(HandleObjectHovered);
+        if (spDisplay != null)
+        {
+            spDisplay.currentPrice += Random.Range(-0.01f, 0.01f);
+            spDisplay.UpdatePrice(spDisplay.currentPrice);
+            Debug.Log("Updated SPDISPLAY PRICE: " + spDisplay.currentPrice);
+        }
+        else
+        {
+            Debug.Log("spDisplay null");
+        }
 
+    }
 
-        //if (spDisplay != null)
-        //{
-        //    // Example usage
-        //    spDisplay = stockPriceCanvas?.GetComponent<StockPriceDisplay>();
-        //    spDisplay?.Initialize("AAPL", 150.00f);
-        //
-        //
-        //    // Later, to update the price (this will automatically update the chart)
-        //    spDisplay?.UpdatePrice(155.50f);
-        //}
-
-
-
-        // Instantiate the InterrogationCanvas prefab
-        //GameObject interrogationCanvasPrefab = Resources.Load<GameObject>("Prefabs/InterrogationCanvas");
-        //if (interrogationCanvasPrefab != null)
-        //{
-        //    Instantiate(interrogationCanvasPrefab);
-        //}
-        //else
-        //{
-        //    Debug.LogError("InterrogationCanvas prefab not found. Please create it using the editor tool first.");
-        //}
+    public void SetGoodEnding()
+    {
+        isGoodEnding = true;
     }
 
     // Update is called once per frame
@@ -403,7 +415,7 @@ public class UnityToGemini : MonoBehaviour
         /// </summary>
         /// <param name="text">Text to be cleaned.</param>
         /// <returns>Cleaned text.</returns>
-        private static string CleanText(string text)
+        public string CleanText(string text)
         {
             foreach (var pattern in InvalidJsonFormatPattern)
             {
@@ -541,6 +553,34 @@ public class UnityToGemini : MonoBehaviour
         //     return sanityToLose;
         // }
 
+        public void DetermineStress()
+        {
+            if (spDisplay.currentPrice - gameplayManager.stockThreshold > 70)
+            {
+                headshotImage.sprite = headshots[0];
+            }
+            else if (spDisplay.currentPrice - gameplayManager.stockThreshold > 50)
+            {
+                headshotImage.sprite = headshots[1];
+
+            }
+            else if (spDisplay.currentPrice - gameplayManager.stockThreshold > 30)
+            {
+                headshotImage.sprite = headshots[2];
+
+            }
+            else if (spDisplay.currentPrice - gameplayManager.stockThreshold > 10)
+            {
+                headshotImage.sprite = headshots[3];
+
+            }
+            else
+            {
+                headshotImage.sprite = headshots[4];
+
+            }
+        }
+
 
         public string UnpackGlobalEvents(string rawResponse)
         {
@@ -549,8 +589,21 @@ public class UnityToGemini : MonoBehaviour
             if (!String.IsNullOrEmpty(geminiResponse.Candidates[0].Contents.Parts[0].Text))
             {
                 newEvent = geminiResponse.Candidates[0].Contents.Parts[0].Text;
+                newEvent = CleanText(newEvent);
             }
             return newEvent;
+        }
+
+        public void GoToEndState()
+        {
+            SceneManager.LoadScene("EndState");
+        }
+
+        public void GoToMenuState()
+        {
+            SceneManager.LoadScene("MenuState");
+            Destroy(gameObject);
+            Destroy(TimeManager.Instance.gameObject);
         }
         
         private void HandleObjectClicked(GameObject clickedObject)

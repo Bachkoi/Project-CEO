@@ -2,7 +2,7 @@
 
 public class ScoreManager : MonoBehaviour
 {
-    [SerializeField] private TimeManager timeManager; // Reference to TimeManager
+    [SerializeField] public TimeManager timeManager; // Reference to TimeManager
     
     private float baseScore;
     private float finalScore;
@@ -13,24 +13,24 @@ public class ScoreManager : MonoBehaviour
     // Calculate the score based on current stock price and days survived
     public void CalculateScore()
     {
-        if (timeManager == null)
-        {
-            Debug.LogError("TimeManager reference not set in ScoreManager!");
-            return;
-        }
+        //if (timeManager == null)
+        //{
+        //    Debug.LogError("TimeManager reference not set in ScoreManager!");
+        //    return;
+        //}
         float currentStockPrice = UnityToGemini.Instance.spDisplay.currentPrice;
         // Base score is the current stock price
         baseScore = currentStockPrice;
         
         // Calculate time modifier (increases with more days survived)
-        float survivalModifier = Mathf.Pow(timeModifier, timeManager.CurrentDay);
+        float survivalModifier = Mathf.Pow(timeModifier, TimeManager.Instance.CurrentDay);
         
         // Calculate final score with time modifier
         finalScore = baseScore * survivalModifier;
         UnityToGemini.Instance.finalScoreTMP.text =
-            $"Score Calculation - Base Score: {baseScore:F2} | Days Survived: {timeManager.CurrentDay} | " +
+            $"Score Calculation - Base Score: {baseScore:F2} | Days Survived: {TimeManager.Instance.CurrentDay} | " +
             $"Time Modifier: {survivalModifier:F2} | Final Score: {finalScore:F2}";
-        Debug.Log($"Score Calculation - Base Score: {baseScore:F2} | Days Survived: {timeManager.CurrentDay} | " +
+        Debug.Log($"Score Calculation - Base Score: {baseScore:F2} | Days Survived: {TimeManager.Instance.CurrentDay} | " +
                   $"Time Modifier: {survivalModifier:F2} | Final Score: {finalScore:F2}");
     }
     

@@ -185,6 +185,16 @@ public class MenuManager : MonoBehaviour
         SceneManager.LoadScene(gameStateName);
     }
 
+    public void GoToEnd()
+    {
+        SceneManager.LoadScene("EndState");
+    }
+
+    public void GoToMainMenu()
+    {
+        SceneManager.LoadScene("MenuState");
+    }
+
     // Update is called once per frame
     void Update()
     {

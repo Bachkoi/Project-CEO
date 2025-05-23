@@ -29,6 +29,12 @@ public class TimeManager : SerializedMonoBehaviour
         get => days.Count > 0 ? days[days.Count - 1].Item1 : 0;
     }
 
+    public int DailyNewsCount
+    {
+        get => dailyNewsCount;
+        set => dailyNewsCount = value;
+    }
+    
     public static event Action<int> onDayChange;
     public static event Action<int> onWeekChange;
     
@@ -191,7 +197,7 @@ public class TimeManager : SerializedMonoBehaviour
         
         // Reset the news counter for the new day
         ResetNewsCounter();
-        
+        UnityToGemini.Instance.hasGlobalEvent = false;
         // Log that a new day has started for debugging
         Debug.Log($"New day started: Day {CurrentDay}. News counter reset.");
     }
