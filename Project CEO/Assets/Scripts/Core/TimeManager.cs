@@ -17,6 +17,11 @@ public class TimeManager : SerializedMonoBehaviour
 
     [SerializeField] private Image daySwitchImage;
     [SerializeField] private Button dayEndBtn;
+
+    private int responseCount = 0;
+    
+    [SerializeField] private int maxNewsPerDay = 4;
+    private int dailyNewsCount = 0;
     
     //getters & setters
     public int CurrentDay
@@ -35,11 +40,13 @@ public class TimeManager : SerializedMonoBehaviour
     private void OnEnable()
     {
         dayEndBtn.onClick.AddListener(EndDay);
+        NewsGenerator.onNewsGenerated += OnNewsGenerated;
     }
 
     private void OnDisable()
     {
         dayEndBtn.onClick.RemoveListener(EndDay);
+        NewsGenerator.onNewsGenerated -= OnNewsGenerated;
     }
 
     /// <summary>
@@ -62,6 +69,11 @@ public class TimeManager : SerializedMonoBehaviour
         
         if (days.Count <= 0)
             days.Add((1, new List<string>()));
+        
+        dayEndBtn.gameObject.SetActive(false);
+        
+        // Initialize news counter
+        dailyNewsCount = 0;
     }
 
     /// <summary>
@@ -116,6 +128,12 @@ public class TimeManager : SerializedMonoBehaviour
         }
         days[CurrentDay-1].Item2.Add(response);
         
+        responseCount++;
+        if (responseCount >= 3)
+        {
+            dayEndBtn.gameObject.SetActive(true);
+        }
+        
     }
 
     public void UpdateTimeText()
@@ -168,6 +186,11 @@ public class TimeManager : SerializedMonoBehaviour
             EndDayAnimation();
         }
         days.Add((CurrentDay+1, new List<string>()));
+        dayEndBtn.gameObject.SetActive(false);
+        responseCount = 0;
+        
+        // Reset the news counter for the new day
+        ResetNewsCounter();
     }
 
     public void EndDayAnimation()
@@ -200,5 +223,38 @@ public class TimeManager : SerializedMonoBehaviour
             yield return null;
         }
         daySwitchImage.gameObject.SetActive(false);
+    }
+    
+    /// <summary>
+    /// Checks if more news can be generated based on the daily limit
+    /// </summary>
+    /// <returns>True if more news can be generated, false if the daily limit is reached</returns>
+    public bool CanGenerateMoreNews()
+    {
+        Debug.Log($"News count check: {dailyNewsCount}/{maxNewsPerDay}");
+        return dailyNewsCount < maxNewsPerDay;
+    }
+    
+    /// <summary>
+    /// Increments the news counter when a new news item is generated
+    /// </summary>
+    public void IncrementNewsCounter()
+    {
+        dailyNewsCount++;
+        Debug.Log($"News counter incremented: {dailyNewsCount}/{maxNewsPerDay}");
+    }
+    
+    /// <summary>
+    /// Resets the news counter, typically called at the end of a day
+    /// </summary>
+    public void ResetNewsCounter()
+    {
+        dailyNewsCount = 0;
+        Debug.Log("News counter reset for new day");
+    }
+
+    private void OnNewsGenerated(string news)
+    {
+        dailyNewsCount++;
     }
 }

@@ -402,10 +402,6 @@ public class UnityToGemini : MonoBehaviour
             CleanText(geminiResponse.Candidates[0].Contents.Parts[0].Text);
             return geminiResponse;
         }
-
-        public void UpdateOGPrompt(){
-            
-        }
         
         public void JudgeCharacter(){
 
