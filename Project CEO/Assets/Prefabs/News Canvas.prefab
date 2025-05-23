@@ -219,8 +219,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Here's important news
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: f87e5f0d7d843854e8e041b349846ea8, type: 2}
+  m_sharedMaterial: {fileID: 2238625210667445101, guid: f87e5f0d7d843854e8e041b349846ea8, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -250,7 +250,7 @@ MonoBehaviour:
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 0
+  m_fontStyle: 1
   m_HorizontalAlignment: 1
   m_VerticalAlignment: 512
   m_textAlignment: 65535
@@ -781,6 +781,7 @@ MonoBehaviour:
   scrollSpeed: 200
   resetPositionX: -12.35
   startPositionX: 1629.5
+  newsCooldownTime: 10
   debugLineColor: {r: 0, g: 0, b: 1, a: 1}
   showDebugLines: 1
   breakingNewsContainer: {fileID: 2205622852226182830}
@@ -859,8 +860,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Daily News
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: f87e5f0d7d843854e8e041b349846ea8, type: 2}
+  m_sharedMaterial: {fileID: 2238625210667445101, guid: f87e5f0d7d843854e8e041b349846ea8, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -890,7 +891,7 @@ MonoBehaviour:
   m_enableAutoSizing: 1
   m_fontSizeMin: 11
   m_fontSizeMax: 72
-  m_fontStyle: 0
+  m_fontStyle: 1
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535

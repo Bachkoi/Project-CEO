@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 3836652592860930778}
   - component: {fileID: 295200060330549862}
   - component: {fileID: 5506499092922659045}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -270,7 +270,7 @@ GameObject:
   - component: {fileID: 1349918284430435994}
   - component: {fileID: 3244051797389048022}
   - component: {fileID: 4962080294969246859}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Trending Image
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -344,7 +344,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8650605975346707079}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Trend Popup Container
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -384,7 +384,7 @@ GameObject:
   - component: {fileID: 983431753607784844}
   - component: {fileID: 2843999946878552591}
   - component: {fileID: 947018383074413010}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Trending Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -519,7 +519,7 @@ GameObject:
   - component: {fileID: 6895353412210180300}
   - component: {fileID: 8516871879420328734}
   - component: {fileID: 5476585158142300867}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Got it Button
   m_TagString: Untagged
   m_Icon: {fileID: 0}
