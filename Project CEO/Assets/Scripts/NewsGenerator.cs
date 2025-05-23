@@ -855,6 +855,15 @@ public class NewsGenerator : MonoBehaviour
         return reaction;
     }
     
+    /// <summary>
+    /// Returns whether the news system is currently in cooldown
+    /// </summary>
+    /// <returns>True if in cooldown, false otherwise</returns>
+    public bool IsInCooldown()
+    {
+        return isCoolingDown;
+    }
+    
     private void OnPublicReact(string react, int score)
     {
         // Format the public reaction for news display
@@ -889,7 +898,15 @@ public class NewsGenerator : MonoBehaviour
                 updatePending = true;
                 
                 // Restart the display sequence which will reset the cooldown properly
-                StartCoroutine(DisplayNewsSequentially());
+                if (isCoolingDown)
+                {
+                    Debug.Log("Cannot start scrolling: in cooldown period");
+                }
+                else
+                {
+                    Debug.Log("Starting news scrolling sequence");
+                    StartCoroutine(DisplayNewsSequentially());
+                }
             }
         }
         else
