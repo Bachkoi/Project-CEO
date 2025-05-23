@@ -145,7 +145,7 @@ public class TimeManager : SerializedMonoBehaviour
     public void UpdateTimeText()
     {
         StringBuilder builder = new StringBuilder();
-        builder.Append("Today is week ");
+        builder.Append("Good Morning! Today is week ");
         builder.Append(currentWeek + 1);
         switch (days.Count % 5)
         {

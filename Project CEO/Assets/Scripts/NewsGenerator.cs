@@ -13,6 +13,9 @@ public class NewsGenerator : MonoBehaviour
 {
     [SerializeField]
     protected TextMeshProUGUI newsTitleText;
+
+    [SerializeField] protected Image newsImage;
+    [SerializeField] protected Sprite heroSprite, fraudSprite;
     
     [SerializeField]
     private float scrollSpeed = 150f; // Scrolling speed
@@ -689,7 +692,6 @@ public class NewsGenerator : MonoBehaviour
     /// <returns>Formatted reaction ready for display</returns>
     private string FormatPublicReaction(string react, int score)
     {
-        Debug.Log("BBBBBBBBBBBB " + react);
         // First, clean up markdown code blocks if present
         string cleanedReact = react;
         if (react.Contains("```"))
@@ -866,6 +868,16 @@ public class NewsGenerator : MonoBehaviour
     
     private void OnPublicReact(string react, int score)
     {
+        //update newsImage
+        if (score < 0)
+        {
+            newsImage.sprite = fraudSprite;
+        }
+        else
+        {
+            newsImage.sprite = heroSprite;
+        }
+        
         // Format the public reaction for news display
         string formattedReaction = FormatPublicReaction(react, score);
         
