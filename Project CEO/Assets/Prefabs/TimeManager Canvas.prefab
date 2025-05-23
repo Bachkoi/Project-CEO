@@ -199,10 +199,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Today is week 1 Monday,
+  m_text: 'Good Morning! Today is week 1 Monday,
 
-    you still need to keep the company running
-    for 5 days
+    you still need to keep the
+    company running for 5 days
 
 '
   m_isRightToLeft: 0
@@ -552,6 +552,7 @@ MonoBehaviour:
   timePopupText: {fileID: 9171977432479956518}
   daySwitchImage: {fileID: 7713273321733959666}
   dayEndBtn: {fileID: 2459821785407920770}
+  maxNewsPerDay: 4
 --- !u!1 &5123887623736817553
 GameObject:
   m_ObjectHideFlags: 0
