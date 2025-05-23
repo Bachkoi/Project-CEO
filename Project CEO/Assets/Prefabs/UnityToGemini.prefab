@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4919726801099544871}
   - component: {fileID: 2615254360093767979}
+  - component: {fileID: 912055053305110041}
   m_Layer: 0
   m_Name: UnityToGemini
   m_TagString: Untagged
@@ -55,4 +56,23 @@ MonoBehaviour:
   spDisplay: {fileID: 0}
   companyName: 
   companyDescription: 
+  companyAcronym: 
+  cm: {fileID: 0}
+  globalEvents: []
+  finalScoreText: 
+  finalScoreTMP: {fileID: 0}
+  UILRTEst: {fileID: 0}
   OGPrompt: 
+--- !u!114 &912055053305110041
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4212454451798096224}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ada0a6508347a2b47abd7ec8397cbf03, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeManager: {fileID: 0}

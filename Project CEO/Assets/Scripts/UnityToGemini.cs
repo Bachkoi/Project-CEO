@@ -1,15 +1,17 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Newtonsoft.Json;
 using UnityEngine.Networking;
 using System.Text;
 using Backend;
 using Sirenix.OdinInspector;
+using TMPro;
 using Random = UnityEngine.Random;
 
-public enum GeminiRequestType {News, Trend, PublicReaction, None}
+public enum GeminiRequestType {News, Trend, PublicReaction, GlobalEvent, None}
 
 public class UnityToGemini : MonoBehaviour
 {
@@ -35,9 +37,13 @@ public class UnityToGemini : MonoBehaviour
     public string companyAcronym;
 
     public CameraManager cm;
+
+    public List<string> globalEvents;
+
+    public string finalScoreText = "";
+
+    public TextMeshProUGUI finalScoreTMP;
     
-
-
     public UILineRendererTest UILRTEst;
 
 
@@ -263,7 +269,12 @@ public class UnityToGemini : MonoBehaviour
             }
             else
             {
+                
                 GeminiResponseCallback?.Invoke(www.downloadHandler.text, type);
+                if (type == GeminiRequestType.GlobalEvent)
+                {
+                    globalEvents.Add(UnpackGlobalEvents(www.downloadHandler.text));;
+                }
                 //TimeManager.Instance.DecrementActionCounter();
                 //Debug.Log("Action Counter: " + TimeManager.Instance.actionCounter);
                 //apiKey = apiInput.Trim();
@@ -321,6 +332,14 @@ public class UnityToGemini : MonoBehaviour
                     GeminiResponseCallback?.Invoke(www.downloadHandler.text, GeminiRequestType.None);
                 }
             }
+    }
+
+    public void GenerateGlobalEvent()
+    {
+        string allOtherEvents = String.Join(",", globalEvents);
+        string globalPrompt =
+            $"We are playing a game. Your job is to generate a global event that is happening in the world. This is not a serious game, so the global event can be funny and humorous. {allOtherEvents} Please make sure the new trend is not the same as the generated ones. Don’t explain your choice. Please return in JSON format: {{GlobalEvent:”answer”}}. ";
+        StartCoroutine(UnityToGemini.Instance.SendRequestToGemini(globalPrompt, GeminiRequestType.GlobalEvent));
     }
 
     public void UpdateQuestion(){
@@ -525,6 +544,18 @@ public class UnityToGemini : MonoBehaviour
         //     
         //     return sanityToLose;
         // }
+
+
+        public string UnpackGlobalEvents(string rawResponse)
+        {
+            string newEvent = "";
+            GeminiResponse geminiResponse = UnpackGeminiResponse(rawResponse);
+            if (!String.IsNullOrEmpty(geminiResponse.Candidates[0].Contents.Parts[0].Text))
+            {
+                newEvent = geminiResponse.Candidates[0].Contents.Parts[0].Text;
+            }
+            return newEvent;
+        }
         
         private void HandleObjectClicked(GameObject clickedObject)
         {

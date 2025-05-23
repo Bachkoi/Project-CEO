@@ -414,7 +414,7 @@ public class NewsGenerator : MonoBehaviour
     /// <param name="rawResponse">The raw JSON string to unpack from Gemini API</param>
     protected void UnpackNewsResponse(string rawResponse, GeminiRequestType type)
     {
-        if (type != GeminiRequestType.News)
+        if (type != GeminiRequestType.News )
             return;
         try
         {
