@@ -5,6 +5,25 @@ using UnityEngine;
 using UnityEngine.Analytics;
 using System;
 
+class Visitor
+{
+    public string name;
+    public VisitorType type;
+    public List<Comment> conversation;
+}
+
+class Comment
+{
+    public bool isPlayer;
+    public string content;
+}
+
+public enum VisitorType
+{
+    Journalist,
+    Interviewer
+};
+
 public class GameplayManager : MonoBehaviour
 {
     public float stockThreshold = 30f;
@@ -15,7 +34,8 @@ public class GameplayManager : MonoBehaviour
     private string lastPlayerResponse;
 
     private bool awaitingPlayerResponse = false;
-    
+    private bool isInterviewOngoing = false;
+
     public NewsGenerator newsGenerator;
 
     public TMP_InputField playerInputField;
@@ -24,6 +44,12 @@ public class GameplayManager : MonoBehaviour
     public static event Action<string, int> onPublicReact;
 
     public static bool canPlayerSend = false;
+
+    private VisitorType currentVisitorType;
+
+    private List<Visitor> visitorHistory;
+    private Visitor currentVisitor;
+
 
     private void OnEnable()
     {
@@ -51,6 +77,22 @@ public class GameplayManager : MonoBehaviour
         canPlayerSend = false;
     }
 
+    public void OnEndInterviewButtonClicked()
+    {
+        if (isInterviewOngoing && currentVisitorType == VisitorType.Interviewer)
+        {
+            isInterviewOngoing = false;
+            string fullConversation = "";
+            foreach (var comment in currentVisitor.conversation)
+            {
+                fullConversation += comment.isPlayer ? "Player: " : "Interviewer: ";
+                fullConversation += comment.content + "\n";
+            }
+
+            UnityToGemini.Instance.SendRequest(fullConversation, GeminiRequestType.Interview);
+        }
+    }
+
     void Start()
     {
         canPlayerSend = false;
@@ -58,12 +100,18 @@ public class GameplayManager : MonoBehaviour
         StartCoroutine(GameLoop());
     }
 
+    public VisitorType DetermineVisitorType()
+    {
+        return UnityEngine.Random.value > 0.5f ? VisitorType.Journalist : VisitorType.Interviewer;
+    }
+
     IEnumerator GameLoop()
     {
+        //currentVisitor = new Visitor { name = "Visitor" + UnityEngine.Random.Range(1, 100), type = currentVisitorType };
         while (true)
         {
             // 1. Company action
-            
+
             yield return RequestCompanyAction();
 
             // 2. Player action
@@ -139,30 +187,12 @@ public class GameplayManager : MonoBehaviour
 
     IEnumerator EvaluatePublicReaction(string companyAction, string playerResponse)
     {
-        //string prompt = $"I'm talking to another AI acting as the public/reacting to a CEOs response. The company recently took this action: {companyAction}. The CEO responded to media/questions with: {playerResponse}.\r\n\r\nEvaluate the CEO's response based on:" +
-        //    $"\r\n\r\nCrisis Management (Did it address the issue effectively?)" +
-        //    $"\r\n\r\nTone/PR Skill (Was it confident, empathetic, or tone-deaf?)" +
-        //    $"\r\n\r\nPublic Perception (How will typical stakeholders react?)." +
-        //    $"\r\n\r\nReturn:" +
-        //    $"\r\n\r\nA score from -2 to 2 (INTEGER ONLY), where:" +
-        //    $"\r\n\r\n-2: Major backlash (e.g., offensive, evasive, or worsening the crisis)" +
-        //    $"\r\n\r\n-1: Poor response (e.g., weak justification, minor tone-deafness, or lukewarm damage control)" +
-        //    $"\r\n\r\n0: Neutral/no impact (e.g., generic corporate speak, neither harm nor gain)" +
-        //    $"\r\n\r\n1: Good save (e.g., solid reasoning, timely apology, or partial trust restoration)" +
-        //    $"\r\n\r\n2: Brilliant save (e.g., transformative framing, inspiring accountability, or viral positivity)" +
-        //    $"\r\n\r\nA short public reaction (e.g., headlines, social media buzz)." +
-        //    $"\r\n\r\nFormat output as:" +
-        //    $"\r\n\r\njson\r\n{{\"saveQuality\": YourScoreHere, \"publicReaction\": \"Your prediction here\"}}  \r\n";
-        //string prompt = $"I’m talking to another AI acting as the public/reacting to a CEO’s response. The company recently took this action: {companyAction}. The CEO responded to media/questions with: {playerResponse}. Evaluate the CEO’s response based on: Crisis Management (Did it address the issue effectively?), Tone/PR Skill (Was it confident, empathetic, or tone-deaf?), Public Perception (How will typical stakeholders react?).\nYou will score their response on a score from -2 to 2 (INTEGER ONLY), where: -2 is backlash, -1 is Poor response, 0 is Neutral/no impact, 1 is Good save, 2 is Great save and a SHORT public reaction (e.g., headlines, social media buzz). Please return it as a json with the following output: {{\"saveQuality\": YourScoreHere, \"publicReaction\": \"Your prediction here\"}}\n";
-        //string prompt = $"I’m talking to another AI in a humorous game reacting to a CEO’s response. The company recently took this action: {{CompanyAction}}. The CEO responded to media/questions with: {{PlayerResponse}}. Evaluate the CEO’s response based on: whether or not you believe that the CEO handled it effectively. You will score their response on a score from -2 to 2 (INTEGER ONLY), where: -2 is backlash, -1 is Poor response, 0 is Neutral/no impact, 1 is Good save, 2 is Great save and a SHORT public reaction (e.g., headlines, social media buzz). Please return it as a json with the following output: {{\"saveQuality\": YourScoreHere, \"publicReaction\": \"Your prediction here\"}}";
-        //string prompt = $"I’m talking to another AI in a humorous game reacting to a CEO’s response. The company recently took this action: {companyAction}. The CEO responded to media/questions with: {playerResponse}. Evaluate the CEO’s response based on: whether or not you believe that the CEO handled it effectively. You will score their response on a score from -2 to 2 (INTEGER ONLY), where: -2 is backlash, -1 is Poor response, 0 is Neutral/no impact, 1 is Good save, 2 is Great save and a SHORT public reaction (e.g., headlines, social media buzz). Please return it in a STRICT JSON with the following output: {{\"saveQuality\": YourScoreHere, \"publicReaction\": \"Your prediction here\"}}";
-        //string prompt = $"I’m talking to another AI in a humorous game reacting to a CEO’s response. The company recently took this action: {companyAction}. The CEO responded to media/questions with: {playerResponse}. Evaluate the CEO’s response based on: whether or not you believe that the CEO handled it effectively, but do NOT take it too seriously, as the game is supposed to be funny and lighthearted. You will score their response on a score from -2 to 2 (INTEGER ONLY), where: -2 is backlash, -1 is Poor response, 0 is Neutral/no impact, 1 is Good save, 2 is Great save and a SHORT public reaction (e.g., headlines, social media buzz). Please return it in a STRICT JSON with the following output: {{\"saveQuality\": YourScoreHere, \"publicReaction\": \"Your prediction here\"}}";
         string prompt = $"I’m talking to another AI in a humorous game reacting to a CEO’s response. The company recently took this action: {companyAction}. The CEO responded to media/questions with: {playerResponse}. Evaluate the CEO’s response based on: whether or not you believe that the CEO handled it effectively, but do NOT take it too seriously, as the game is supposed to be funny and lighthearted. You will rate their response on a score from -2 to 2 (INTEGER ONLY), where: -2 is backlash, -1 is Poor response, 0 is Neutral/no impact, 1 is Good save, 2 is Great save and a SHORT public reaction (e.g., headlines, social media buzz). Please return it in a STRICT JSON with the following output: {{\"responseQuality\": YourScoreHere, \"publicReaction\": \"Your prediction here\"}}";
         bool isResponseReceived = false;
 
         UnityToGemini.GeminiResponseCallback += OnPublicReaction;
         UnityToGemini.Instance.SendRequest(prompt, GeminiRequestType.PublicReaction);
-        
+
         void OnPublicReaction(string responseJson, GeminiRequestType type)
         {
             if (type != GeminiRequestType.PublicReaction)
@@ -173,26 +203,26 @@ public class GameplayManager : MonoBehaviour
             float delta = 0.0f;
             //float delta = reaction.Contains("up") ? stockPriceChangeMagnitude : -stockPriceChangeMagnitude;
             int reactScore = 0;
-                
+
             if (reaction.Contains("-2"))
             {
-                delta = -stockPriceChangeMagnitude/2.0f;
+                delta = -stockPriceChangeMagnitude / 2.0f;
                 reactScore = -2;
 
             }
             else if (reaction.Contains("-1"))
             {
-                delta = -stockPriceChangeMagnitude/4.0f;
+                delta = -stockPriceChangeMagnitude / 4.0f;
                 reactScore = -1;
             }
             else if (reaction.Contains("0"))
             {
-                delta = stockPriceChangeMagnitude/4.0f;
+                delta = stockPriceChangeMagnitude / 4.0f;
                 reactScore = 0;
             }
             else if (reaction.Contains("1"))
             {
-                delta = stockPriceChangeMagnitude/2.0f;
+                delta = stockPriceChangeMagnitude / 2.0f;
                 reactScore = 1;
             }
             else
@@ -205,7 +235,7 @@ public class GameplayManager : MonoBehaviour
 
             isResponseReceived = true;
             UnityToGemini.GeminiResponseCallback -= OnPublicReaction;
-            
+
             onPublicReact?.Invoke(reaction, reactScore);
         }
 

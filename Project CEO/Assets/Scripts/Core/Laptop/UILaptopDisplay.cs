@@ -15,6 +15,8 @@ public class UILaptopDisplay : MonoBehaviour
     public GameObject journalistBubblePrefab;
     public GameObject visitorNameTagPrefab;
     public Button sendButton;
+    public Button endInterviewButton;
+
 
     private void OnEnable()
     {
@@ -35,32 +37,12 @@ public class UILaptopDisplay : MonoBehaviour
         LaptopUIInit();
     }
 
-    private static readonly List<string> questionTemplates = new List<string>
-    {
-        "What's your take on [XXX]?",
-        "How do you view the recent developments around [XXX]?",
-        "What's your perspective on the situation with [XXX]?",
-        "Where do you stand on [XXX]?",
-        "How do you interpret the news about [XXX]?",
-        "Do you see [XXX] as a threat or an opportunity?",
-        "What implications do you think [XXX] might have for the industry?",
-        "How are you personally reacting to the news around [XXX]?",
-        "What message would you share in response to [XXX]?",
-        "What concerns, if any, do you have about [XXX]?"
-    };
-
     public void LaptopUIInit()
     {
         ClearVisitor();
         ClearDialog();
     }
-
-    public static string GenerateRandomQuestion(string newsTitle)
-    {
-        int randomIndex = UnityEngine.Random.Range(0, questionTemplates.Count);
-        string selectedTemplate = questionTemplates[randomIndex];
-        return selectedTemplate.Replace("[XXX]", newsTitle);
-    }
+    
 
     private void AddVisitor()
     {
@@ -72,9 +54,6 @@ public class UILaptopDisplay : MonoBehaviour
         {
             dialogText.text = RandomNameGenerator.GenerateRandomName();
         }
-
-        //Set panel visible (For some reasons IDK they were set to inactive)
-        //UIUtilities.SetActiveStatusAll(journalistNameTag,true);
     }
 
     private void ClearVisitor()
@@ -147,51 +126,28 @@ public class UILaptopDisplay : MonoBehaviour
 
         sendButton.enabled = false;
     }
-}
 
-public class RandomNameGenerator
-{
-    private static readonly System.Random random = new System.Random();
-
-    private static readonly List<string> lastNames = new List<string>
+    //Random Question Generation
+    private static readonly List<string> questionTemplates = new List<string>
     {
-        "Smith", "Johnson", "Williams", "Brown", "Jones",
-        "Miller", "Davis", "Garcia", "Rodriguez", "Wilson"
+        "What's your take on [XXX]?",
+        "How do you view the recent developments around [XXX]?",
+        "What's your perspective on the situation with [XXX]?",
+        "Where do you stand on [XXX]?",
+        "How do you interpret the news about [XXX]?",
+        "Do you see [XXX] as a threat or an opportunity?",
+        "What implications do you think [XXX] might have for the industry?",
+        "How are you personally reacting to the news around [XXX]?",
+        "What message would you share in response to [XXX]?",
+        "What concerns, if any, do you have about [XXX]?"
     };
 
-    private static readonly List<string> maleFirstNames = new List<string>
+    public static string GenerateRandomQuestion(string newsTitle)
     {
-        "James", "John", "Robert", "Michael", "William",
-        "David", "Richard", "Joseph", "Thomas", "Daniel"
-    };
-
-    private static readonly List<string> femaleFirstNames = new List<string>
-    {
-        "Mary", "Patricia", "Jennifer", "Linda", "Elizabeth",
-        "Barbara", "Susan", "Jessica", "Sarah", "Karen"
-    };
-
-    public static string GenerateRandomName(int gender = 0)
-    {
-        string lastName = lastNames[random.Next(lastNames.Count)];
-
-        string firstName;
-        int actualGender = gender;
-
-        if (actualGender == 0)
-        {
-            actualGender = random.Next(1, 3); // 1 or 2
-        }
-
-        if (actualGender == 1)
-        {
-            firstName = maleFirstNames[random.Next(maleFirstNames.Count)];
-        }
-        else
-        {
-            firstName = femaleFirstNames[random.Next(femaleFirstNames.Count)];
-        }
-
-        return $"{firstName} {lastName}";
+        int randomIndex = UnityEngine.Random.Range(0, questionTemplates.Count);
+        string selectedTemplate = questionTemplates[randomIndex];
+        return selectedTemplate.Replace("[XXX]", newsTitle);
     }
 }
+
+

@@ -9,7 +9,7 @@ using Backend;
 using Sirenix.OdinInspector;
 using Random = UnityEngine.Random;
 
-public enum GeminiRequestType {News, Trend, PublicReaction, None}
+public enum GeminiRequestType {News, Trend, PublicReaction, Interview, None}
 
 public class UnityToGemini : MonoBehaviour
 {
